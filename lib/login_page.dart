@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'register_page.dart';
-import 'forgot_password_page.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -9,68 +7,168 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Center(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("LOGODESAIN", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                SizedBox(height: 32),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(labelText: "Email"),
+                // Logo
+                Container(
+                  margin: const EdgeInsets.only(bottom: 24),
+                  child: CircleAvatar(
+                    radius: 48,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.ac_unit, size: 48, color: Colors.blue),
+                    // Ganti dengan logo asli jika ada
+                  ),
                 ),
-                TextField(
+
+                Text(
+                  'Selamat datang di',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                Text(
+                  'LOGODESAIN',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Email field
+                buildInputField(
+                  icon: Icons.email,
+                  hint: 'Email',
+                  controller: emailController,
+                ),
+
+                // Password field
+                buildInputField(
+                  icon: Icons.lock,
+                  hint: 'Kata sandi',
                   controller: passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(labelText: "Password"),
                 ),
+
+                const SizedBox(height: 12),
+
+                // Tombol Login
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.blue.shade900,
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      String email = emailController.text.trim();
+                      String password = passwordController.text.trim();
+
+                      if (email.isEmpty || password.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Email dan password tidak boleh kosong"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (!email.contains('@') ||
+                          (!email.endsWith('.com') && !email.endsWith('.ac.id'))) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Email harus valid dan diakhiri dengan .com atau .ac.id"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      Navigator.pushReplacementNamed(context, '/home');
+                    },
+                    child: Text("Masuk"),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Lupa Sandi
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.centerLeft,
                   child: TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/forgot-password');
                     },
-                    child: Text("Lupa password?"),
+                    child: Text("Lupa sandi", style: TextStyle(color: Colors.white)),
                   ),
                 ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    String email = emailController.text.trim();
-                    String password = passwordController.text.trim();
 
-                    if (email.isEmpty || password.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Email dan password tidak boleh kosong"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    } else {
-                      Navigator.pushReplacementNamed(context, '/home');
-                    }
-                  },
-                  child: Text("Login"),
-                ),
-                SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Belum punya akun?"),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      child: Text("Buat akun"),
+                const SizedBox(height: 24),
+
+                // Belum punya akun
+                Text('Belum memiliki akun', style: TextStyle(color: Colors.white)),
+                const SizedBox(height: 8),
+
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: BorderSide(color: Colors.white),
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ],
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/register');
+                  },
+                  child: Text('Daftar'),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildInputField({
+    required IconData icon,
+    required String hint,
+    required TextEditingController controller,
+    bool obscureText = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        border: Border.all(color: Colors.white),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        style: TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.white),
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.white70),
+          border: InputBorder.none,
         ),
       ),
     );

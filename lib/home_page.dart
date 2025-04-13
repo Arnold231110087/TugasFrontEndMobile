@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  final Color primaryColor = Color(0xFF1E3A8A); // warna biru
+  final Color primaryColor = Color(0xFF1E3A8A);
 
   @override
   Widget build(BuildContext context) {
@@ -9,12 +9,21 @@ class HomePage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: primaryColor,
-        title: Text("LOGODESAIN", style: TextStyle(fontWeight: FontWeight.bold)),
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Text(
+          "LOGODESAIN",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.account_circle_outlined),
-            onPressed: () {},
-          )
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Icon(Icons.chat_bubble_outline, color: Colors.white),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -22,35 +31,77 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Desainer Terbaik
-            Text("Desainer terbaik", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text("Desainer dengan penjualan terbaik pada Bulan Desember"),
-            SizedBox(height: 10),
+            Text(
+              "Desainer terbaik",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 4),
+            Text(
+              "Desainer dengan penjualan terbanyak pada Bulan Desember",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(height: 12),
             SizedBox(
-              height: 120,
+              height: 160, // ditambah agar lebih panjang
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _buildDesignerCard("Richardo Lieberio", "17 Penjualan", 5.0, "assets/profile1.png"),
-                  _buildDesignerCard("Jessica Bui", "10 Penjualan", 4.8, "assets/profile2.png"),
+                  _buildDesignerCard(
+                    name: "Richardo Lieberio",
+                    sales: "17 Penjualan",
+                    rating: 5.0,
+                    followers: "198 Pengikut",
+                    imageAsset: "assets/profile1.png",
+                  ),
+                  _buildDesignerCard(
+                    name: "Jessica Bui",
+                    sales: "10 Penjualan",
+                    rating: 4.8,
+                    followers: "193 Pengikut",
+                    imageAsset: "assets/profile2.png",
+                  ),
                 ],
               ),
             ),
             SizedBox(height: 20),
-
-            // Transaksi Terkini
-            _buildSectionHeader("Transaksi terkini", onViewAll: () {}),
-            _buildTransactionCard("Kevin Durant telah menyelesaikan sebuah transaksi", 5.0, "assets/profile3.png"),
-            _buildTransactionCard("Ahmad telah menyelesaikan sebuah transaksi", 4.0, "assets/profile4.png"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Transaksi terkini",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text("Lihat semua", style: TextStyle(fontSize: 12)),
+                )
+              ],
+            ),
+            _buildTransactionCard(
+              name: "Kevin Durant",
+              message: "telah menyelesaikan sebuah transaksi",
+              rating: 5.0,
+              sales: "12 Penjualan",
+              imageAsset: "assets/profile3.png",
+            ),
+            _buildTransactionCard(
+              name: "Ahmad",
+              message: "telah menyelesaikan sebuah transaksi",
+              rating: 4.0,
+              sales: "3 Penjualan",
+              imageAsset: "assets/profile4.png",
+            ),
             SizedBox(height: 20),
-
-            // Akun yang anda ikuti
-            Text("Akun yang anda ikuti", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              "Akun yang anda ikuti",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 10),
             _buildFollowedCard(
               username: "Rendy",
               time: "3 jam lalu",
-              message: "Beberapa logo yang pernah dikerjakan untuk giant companies yang ada di Indonesia",
+              message:
+                  "Beberapa logo yang pernah aku kerjakan untuk giant companies yang ada di Indonesia",
               logos: [
                 "assets/bca.png",
                 "assets/aruda.png",
@@ -59,32 +110,21 @@ class HomePage extends StatelessWidget {
               ],
               profileImage: "assets/profile5.png",
             ),
-            _buildFollowedCard(
-              username: "Jessica Bui",
-              time: "9 jam lalu",
-              message: "Ui/UX yang bisa desain logo yang cool dan elegant",
-              logos: [],
-              profileImage: "assets/profile2.png",
-            ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: primaryColor,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-        ],
       ),
     );
   }
 
-  Widget _buildDesignerCard(String name, String sales, double rating, String imageAsset) {
+  Widget _buildDesignerCard({
+    required String name,
+    required String sales,
+    required double rating,
+    required String followers,
+    required String imageAsset,
+  }) {
     return Container(
-      width: 220,
+      width: 260,
       margin: EdgeInsets.only(right: 12),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -94,20 +134,31 @@ class HomePage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(backgroundImage: AssetImage(imageAsset), radius: 25),
-          SizedBox(width: 10),
+          Column(
+            children: [
+              CircleAvatar(backgroundImage: AssetImage(imageAsset), radius: 28),
+              SizedBox(height: 6),
+              Text(
+                followers,
+                style: TextStyle(fontSize: 10, color: Colors.black),
+              ),
+            ],
+          ),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(sales, style: TextStyle(fontSize: 12)),
+                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                SizedBox(height: 2),
+                Text(sales, style: TextStyle(fontSize: 11)),
+                SizedBox(height: 4),
                 Row(
                   children: List.generate(5, (index) {
-                    return Icon(Icons.star, color: Colors.amber, size: 16);
+                    return Icon(Icons.star, color: Colors.amber, size: 14);
                   }),
                 ),
-                Text(rating.toString(), style: TextStyle(fontSize: 12)),
+                Text(rating.toString(), style: TextStyle(fontSize: 11)),
               ],
             ),
           )
@@ -116,14 +167,20 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionCard(String message, double rating, String imageAsset) {
+  Widget _buildTransactionCard({
+    required String name,
+    required String message,
+    required double rating,
+    required String sales,
+    required String imageAsset,
+  }) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade200),
         borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
+        color: Colors.grey.shade100,
       ),
       child: Row(
         children: [
@@ -133,12 +190,13 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(message),
+                Text("$name $message", style: TextStyle(fontSize: 13)),
                 Row(
                   children: List.generate(5, (index) {
-                    return Icon(Icons.star, color: Colors.amber, size: 16);
+                    return Icon(Icons.star, color: Colors.amber, size: 14);
                   }),
                 ),
+                Text(sales, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
               ],
             ),
           )
@@ -169,7 +227,7 @@ class HomePage extends StatelessWidget {
             children: [
               CircleAvatar(backgroundImage: AssetImage(profileImage)),
               SizedBox(width: 10),
-              Text(username),
+              Text(username, style: TextStyle(fontWeight: FontWeight.bold)),
               Spacer(),
               Text(time, style: TextStyle(fontSize: 12, color: Colors.grey)),
               Icon(Icons.more_vert),
@@ -199,20 +257,6 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title, {VoidCallback? onViewAll}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        if (onViewAll != null)
-          TextButton(
-            onPressed: onViewAll,
-            child: Text("Lihat semua"),
-          ),
-      ],
     );
   }
 }
