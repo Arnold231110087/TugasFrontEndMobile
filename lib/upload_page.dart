@@ -21,7 +21,21 @@ class UploadPage extends StatelessWidget {
                 SizedBox(width: 30,),
                 Text("Valerio Liuz Kienata",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)
               ],
-            )
+            ),
+            SizedBox(height: 15,),
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Tulis Sesuatu...",
+                  contentPadding: EdgeInsets.all(20),
+                  border:OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 0,
+                      style: BorderStyle.none
+                    )
+                  )
+                ),
+              ))
           ],
         ),
         ),
