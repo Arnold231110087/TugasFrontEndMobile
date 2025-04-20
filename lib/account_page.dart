@@ -68,7 +68,7 @@ class _AccountPageState extends State < AccountPage > {
           children: [
             const CircleAvatar(
                 radius: 30,
-                backgroundImage: AssetImage('assets/avatar.png'),
+                backgroundImage: AssetImage('images/profile1.png'),
               ),
               const SizedBox(width: 12),
                 Expanded(

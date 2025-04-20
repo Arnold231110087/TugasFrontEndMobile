@@ -86,7 +86,7 @@ class SearchPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(radius: 22, backgroundImage: AssetImage("assets/profile1.png")),
+          CircleAvatar(radius: 22, backgroundImage: AssetImage("images/profile1.png")),
           SizedBox(width: 10),
           Expanded(
             child: Column(

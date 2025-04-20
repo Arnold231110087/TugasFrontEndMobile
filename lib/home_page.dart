@@ -51,14 +51,14 @@ class HomePage extends StatelessWidget {
                     sales: "17 Penjualan",
                     rating: 5.0,
                     followers: "198 Pengikut",
-                    imageAsset: "assets/profile1.png",
+                    imageAsset: "images/profile1.png",
                   ),
                   _buildDesignerCard(
                     name: "Jessica Bui",
                     sales: "10 Penjualan",
                     rating: 4.8,
                     followers: "193 Pengikut",
-                    imageAsset: "assets/profile2.png",
+                    imageAsset: "images/profile2.png",
                   ),
                 ],
               ),
@@ -82,14 +82,14 @@ class HomePage extends StatelessWidget {
               message: "telah menyelesaikan sebuah transaksi",
               rating: 5.0,
               sales: "12 Penjualan",
-              imageAsset: "assets/profile3.png",
+              imageAsset: "images/profile3.png",
             ),
             _buildTransactionCard(
               name: "Ahmad",
               message: "telah menyelesaikan sebuah transaksi",
               rating: 4.0,
               sales: "3 Penjualan",
-              imageAsset: "assets/profile4.png",
+              imageAsset: "images/profile4.png",
             ),
             SizedBox(height: 20),
             Text(
@@ -103,12 +103,12 @@ class HomePage extends StatelessWidget {
               message:
                   "Beberapa logo yang pernah aku kerjakan untuk giant companies yang ada di Indonesia",
               logos: [
-                "assets/bca.png",
-                "assets/aruda.png",
-                "assets/gojek.png",
-                "assets/pertamina.png"
+                "images/bca.png",
+                "images/garuda.png",
+                "images/gojek.png",
+                "images/pertamina.png"
               ],
-              profileImage: "assets/profile5.png",
+              profileImage: "images/profile5.png",
             ),
           ],
         ),

@@ -17,7 +17,7 @@ class UploadPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(backgroundImage: AssetImage("assets/1.png"),),
+                CircleAvatar(backgroundImage: AssetImage("images/profile1.png"),),
                 SizedBox(width: 30,),
                 Text("Valerio Liuz Kienata",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)
               ],
@@ -25,8 +25,11 @@ class UploadPage extends StatelessWidget {
             SizedBox(height: 15,),
             Expanded(
               child: TextField(
+                maxLines: 10,
                 decoration: InputDecoration(
                   hintText: "Tulis Sesuatu...",
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 218, 213, 213),
                   contentPadding: EdgeInsets.all(20),
                   border:OutlineInputBorder(
                     borderSide: BorderSide(

@@ -9,7 +9,7 @@ class PostPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(backgroundImage: AssetImage('assets/avatar.png')),
+              CircleAvatar(backgroundImage: AssetImage('images/profile1.png')),
               SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
