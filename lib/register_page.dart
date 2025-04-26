@@ -6,6 +6,8 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
+  RegisterPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,6 +126,7 @@ class RegisterPage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
+        // ignore: deprecated_member_use
         color: Colors.white.withOpacity(0.1),
         border: Border.all(color: Colors.white),
         borderRadius: BorderRadius.circular(12),
@@ -131,6 +134,7 @@ class RegisterPage extends StatelessWidget {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        cursorColor: Colors.white,
         style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.white),

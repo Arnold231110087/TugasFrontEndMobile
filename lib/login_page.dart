@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
+  LoginPage({super.key});
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -93,7 +94,7 @@ class LoginPage extends StatelessWidget {
                           (!email.endsWith('.com') && !email.endsWith('.ac.id'))) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("Email harus valid dan diakhiri dengan .com atau .ac.id"),
+                            content: Text("Email harus valid"),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -156,6 +157,7 @@ class LoginPage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
+        // ignore: deprecated_member_use
         color: Colors.white.withOpacity(0.1),
         border: Border.all(color: Colors.white),
         borderRadius: BorderRadius.circular(12),
@@ -163,6 +165,7 @@ class LoginPage extends StatelessWidget {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        cursorColor: Colors.white,
         style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.white),

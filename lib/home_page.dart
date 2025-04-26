@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
+  HomePage({super.key});
   final Color primaryColor = Color(0xFF1E3A8A);
 
   @override
@@ -238,9 +239,9 @@ class HomePage extends StatelessWidget {
           if (logos.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: Wrap(
+              child: Row(
                 spacing: 10,
-                children: logos.map((logo) => Image.asset(logo, width: 50)).toList(),
+                children: logos.map((logo) => Image.asset(logo, width: 70)).toList(),
               ),
             ),
           SizedBox(height: 8),

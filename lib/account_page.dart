@@ -1,9 +1,12 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'sales_page.dart';
 import 'post_page.dart';
 import 'account_settings.dart';
 
 class AccountPage extends StatefulWidget {
+  const AccountPage({super.key});
   @override
   _AccountPageState createState() => _AccountPageState();
 }

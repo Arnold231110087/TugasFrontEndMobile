@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class SearchPage extends StatelessWidget {
   final Color primaryColor = Color(0xFF1E3A8A);
 
+  SearchPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

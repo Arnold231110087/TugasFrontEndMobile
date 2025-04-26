@@ -11,6 +11,7 @@ import 'account_page.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MainNavigation extends StatefulWidget {
+  const MainNavigation({super.key});
   @override
   State<MainNavigation> createState() => _MainNavigationState();
 }

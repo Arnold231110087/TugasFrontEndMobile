@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NotificationPage extends StatelessWidget {
+  NotificationPage({super.key});
   final Color primaryColor = Color(0xFF1E3A8A);
 
   @override

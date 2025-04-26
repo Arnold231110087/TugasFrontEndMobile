@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
+  ForgotPasswordPage({super.key});
+
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
@@ -101,12 +103,14 @@ class ForgotPasswordPage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
+        // ignore: deprecated_member_use
         color: Colors.white.withOpacity(0.1),
         border: Border.all(color: Colors.white),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
         controller: controller,
+        cursorColor: Colors.white,
         style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.white),
