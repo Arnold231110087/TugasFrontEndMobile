@@ -12,6 +12,17 @@ class HomePage extends StatelessWidget {
         backgroundColor: primaryColor,
         elevation: 0,
         automaticallyImplyLeading: false,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              color: Colors.white,
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
         title: Text(
           "LOGODESAIN",
           style: TextStyle(
@@ -26,6 +37,48 @@ class HomePage extends StatelessWidget {
             child: Icon(Icons.chat_bubble_outline, color: Colors.white),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 60,
+              width: double.infinity, // Adjust the height as needed
+              child: DrawerHeader(
+                decoration: const BoxDecoration(color: Color(0xFF1E3A8A)),
+                child: const Text(
+                  'Account Settings',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildDrawerTile(
+                    title: 'Edit Profile',
+                    icon: const Icon(Icons.person),
+                  ),
+                  _buildDrawerTile(
+                    title: 'Change Password',
+                    icon: const Icon(Icons.lock),
+                  ),
+                  _buildDrawerTile(
+                    title: 'Privacy',
+                    icon: const Icon(Icons.privacy_tip),
+                  ),
+                  _buildDrawerTile(
+                    title: 'Notifications',
+                    icon: const Icon(Icons.notifications),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            _buildDrawerTile(title: 'Log out', icon: const Icon(Icons.logout)),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -75,7 +128,7 @@ class HomePage extends StatelessWidget {
                 TextButton(
                   onPressed: () {},
                   child: Text("Lihat semua", style: TextStyle(fontSize: 12)),
-                )
+                ),
               ],
             ),
             _buildTransactionCard(
@@ -107,7 +160,7 @@ class HomePage extends StatelessWidget {
                 "images/bca.png",
                 "images/garuda.png",
                 "images/gojek.png",
-                "images/pertamina.png"
+                "images/pertamina.png",
               ],
               profileImage: "images/profile5.png",
             ),
@@ -115,6 +168,10 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildDrawerTile({required String title, required Icon icon}) {
+    return ListTile(title: Text(title), leading: icon,onTap: (){},);
   }
 
   Widget _buildDesignerCard({
@@ -150,7 +207,10 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(
+                  name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
                 SizedBox(height: 2),
                 Text(sales, style: TextStyle(fontSize: 11)),
                 SizedBox(height: 4),
@@ -162,7 +222,7 @@ class HomePage extends StatelessWidget {
                 Text(rating.toString(), style: TextStyle(fontSize: 11)),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -197,10 +257,13 @@ class HomePage extends StatelessWidget {
                     return Icon(Icons.star, color: Colors.amber, size: 14);
                   }),
                 ),
-                Text(sales, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                Text(
+                  sales,
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -241,7 +304,8 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.only(top: 10),
               child: Row(
                 spacing: 10,
-                children: logos.map((logo) => Image.asset(logo, width: 70)).toList(),
+                children:
+                    logos.map((logo) => Image.asset(logo, width: 70)).toList(),
               ),
             ),
           SizedBox(height: 8),
@@ -255,7 +319,7 @@ class HomePage extends StatelessWidget {
               SizedBox(width: 4),
               Text("6"),
             ],
-          )
+          ),
         ],
       ),
     );
