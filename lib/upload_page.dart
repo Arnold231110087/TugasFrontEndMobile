@@ -7,14 +7,6 @@ class UploadPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-
-        title: Text(
-          "Unggahan Baru",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(

@@ -8,25 +8,6 @@ class NotificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          "LOGODESAIN",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 20,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.chat_bubble_outline, color: Colors.white),
-          ),
-        ],
-      ),
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [

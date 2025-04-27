@@ -8,78 +8,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              color: Colors.white,
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
-        ),
-        title: Text(
-          "LOGODESAIN",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 20,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.chat_bubble_outline, color: Colors.white),
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 60,
-              width: double.infinity, // Adjust the height as needed
-              child: DrawerHeader(
-                decoration: const BoxDecoration(color: Color(0xFF1E3A8A)),
-                child: const Text(
-                  'Account Settings',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildDrawerTile(
-                    title: 'Edit Profile',
-                    icon: const Icon(Icons.person),
-                  ),
-                  _buildDrawerTile(
-                    title: 'Change Password',
-                    icon: const Icon(Icons.lock),
-                  ),
-                  _buildDrawerTile(
-                    title: 'Privacy',
-                    icon: const Icon(Icons.privacy_tip),
-                  ),
-                  _buildDrawerTile(
-                    title: 'Notifications',
-                    icon: const Icon(Icons.notifications),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(),
-            _buildDrawerTile(title: 'Log out', icon: const Icon(Icons.logout)),
-          ],
-        ),
-      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -170,9 +98,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerTile({required String title, required Icon icon}) {
-    return ListTile(title: Text(title), leading: icon,onTap: (){},);
-  }
 
   Widget _buildDesignerCard({
     required String name,

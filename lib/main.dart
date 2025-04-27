@@ -45,6 +45,10 @@ class _MainNavigationState extends State<MainNavigation> {
     AccountPage(),
   ];
 
+  final _title = [
+    'LOGODESAIN','LOGODESAIN',"Unggahan Baru","LOGODESAIN",'LOGODESAIN'
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -53,7 +57,81 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+  final Color primaryColor = Color(0xFF1E3A8A);
+
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              color: Colors.white,
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
+        title: Text(
+          _title[_selectedIndex],
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Icon(Icons.chat_bubble_outline, color: Colors.white),
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 60,
+              width: double.infinity, // Adjust the height as needed
+              child: DrawerHeader(
+                decoration: const BoxDecoration(color: Color(0xFF1E3A8A)),
+                child: const Text(
+                  'Account Settings',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildDrawerTile(
+                    title: 'Edit Profile',
+                    icon: const Icon(Icons.person),
+                  ),
+                  _buildDrawerTile(
+                    title: 'Change Password',
+                    icon: const Icon(Icons.lock),
+                  ),
+                  _buildDrawerTile(
+                    title: 'Privacy',
+                    icon: const Icon(Icons.privacy_tip),
+                  ),
+                  _buildDrawerTile(
+                    title: 'Notifications',
+                    icon: const Icon(Icons.notifications),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            _buildDrawerTile(title: 'Log out', icon: const Icon(Icons.logout)),
+          ],
+        ),
+      ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -72,5 +150,8 @@ class _MainNavigationState extends State<MainNavigation> {
         ],
       ),
     );
+  }
+    Widget _buildDrawerTile({required String title, required Icon icon}) {
+    return ListTile(title: Text(title), leading: icon,onTap: (){},);
   }
 }

@@ -27,7 +27,6 @@ class _AccountPageState extends State < AccountPage > {
         body: SafeArea(
           child: Column(
             children: [
-              _buildHeader(),
               _buildProfileInfo(),
               if (!isSettingsOpen) _buildTabMenu(),
                 Expanded(
@@ -41,27 +40,6 @@ class _AccountPageState extends State < AccountPage > {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-        color: const Color(0xff0039a6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                  "Valerio Liuz Kienata",
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white),
-                    onPressed: () {
-                      // future menu page if needed
-                    },
-                )
-            ],
-          ),
-    );
-  }
 
   Widget _buildProfileInfo() {
     return Container(
