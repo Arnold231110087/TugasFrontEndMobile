@@ -86,7 +86,7 @@ class _MainNavigationState extends State<MainNavigation> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.chat_bubble_outline, color: Colors.white),
+            child: _selectedIndex == 4 ? Text("VALERIO LIUZ KIENATA",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),) : Icon(Icons.chat_bubble_outline, color: Colors.white),
           ),
         ],
       ),

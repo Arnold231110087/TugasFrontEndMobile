@@ -37,6 +37,7 @@ class UploadPage extends StatelessWidget {
                 ),
               ),
             ),
+            Spacer(),
             ElevatedButton(onPressed: () {}, child: Text("Upload")),
           ],
         ),
