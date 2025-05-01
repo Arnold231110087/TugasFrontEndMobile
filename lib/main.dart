@@ -7,6 +7,9 @@ import 'search_page.dart';
 import 'upload_page.dart';
 import 'notification_page.dart';
 import 'account_page.dart';
+import 'chat_page.dart';
+import 'edit_profile.dart';
+import 'change_password.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,6 +23,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginPage(),
+        '/login': (context) => LoginPage(),
         '/home': (context) => MainNavigation(), // Ganti ke MainNavigation
         '/register': (context) => RegisterPage(),
         '/forgot-password': (context) => ForgotPasswordPage(),
@@ -46,7 +50,11 @@ class _MainNavigationState extends State<MainNavigation> {
   ];
 
   final _title = [
-    'LOGODESAIN','LOGODESAIN',"Unggahan Baru","LOGODESAIN",'LOGODESAIN'
+    'LOGODESAIN',
+    'LOGODESAIN',
+    "Unggahan Baru",
+    "LOGODESAIN",
+    'LOGODESAIN',
   ];
 
   void _onItemTapped(int index) {
@@ -57,7 +65,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
-  final Color primaryColor = Color(0xFF1E3A8A);
+    final Color primaryColor = Color(0xFF1E3A8A);
 
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +94,28 @@ class _MainNavigationState extends State<MainNavigation> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: _selectedIndex == 4 ? Text("VALERIO LIUZ KIENATA",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),) : Icon(Icons.chat_bubble_outline, color: Colors.white),
+            child:
+                _selectedIndex == 4
+                    ? Text(
+                      "VALERIO LIUZ KIENATA",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                    : IconButton(
+                      icon: const Icon(
+                        Icons.chat_bubble_outline,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ChatPage()),
+                        );
+                      },
+                    ),
           ),
         ],
       ),
@@ -111,24 +140,35 @@ class _MainNavigationState extends State<MainNavigation> {
                   _buildDrawerTile(
                     title: 'Edit Profile',
                     icon: const Icon(Icons.person),
+                    url: EditProfilePage()
                   ),
                   _buildDrawerTile(
                     title: 'Change Password',
                     icon: const Icon(Icons.lock),
+                    url: ChangePassword()
+
                   ),
                   _buildDrawerTile(
                     title: 'Privacy',
                     icon: const Icon(Icons.privacy_tip),
+                    url: EditProfilePage()
+
                   ),
                   _buildDrawerTile(
                     title: 'Notifications',
                     icon: const Icon(Icons.notifications),
+                    url: EditProfilePage()
+
                   ),
                 ],
               ),
             ),
             const Divider(),
-            _buildDrawerTile(title: 'Log out', icon: const Icon(Icons.logout)),
+            _buildDrawerTile(
+              title: 'Log out', 
+              icon: const Icon(Icons.logout),
+              url: LoginPage(),
+              isLogout: true),
           ],
         ),
       ),
@@ -144,14 +184,49 @@ class _MainNavigationState extends State<MainNavigation> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Beranda"),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: "Cari"),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "Unggah"),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications_none), label: "Notifikasi"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_box_outlined),
+            label: "Unggah",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_none),
+            label: "Notifikasi",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Akun"),
         ],
       ),
     );
   }
-    Widget _buildDrawerTile({required String title, required Icon icon}) {
-    return ListTile(title: Text(title), leading: icon,onTap: (){},);
+
+  Widget _buildDrawerTile({
+    required String title,
+    required Icon icon,
+    bool isLogout = false,
+    required Widget url,
+  }) {
+    return ListTile(
+      title: Text(title),
+      leading: icon,
+      onTap: () async{
+        if (!isLogout) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => url),
+        );
+        }
+        else{
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Akun berhasil logout')),
+          );
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) {
+            Navigator.pushReplacementNamed(context, '/login'); // pastikan route '/login' sudah didefinisikan
+            }
+          });
+          
+        }
+      },
+      
+    );
   }
 }
