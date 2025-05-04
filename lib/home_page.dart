@@ -6,16 +6,16 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: primaryColor,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
           "LOGODESAIN",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
             fontSize: 20,
           ),
         ),
@@ -47,6 +47,7 @@ class HomePage extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 children: [
                   _buildDesignerCard(
+                    context,
                     name: "Richardo Lieberio",
                     sales: "17 Penjualan",
                     rating: 5.0,
@@ -54,6 +55,7 @@ class HomePage extends StatelessWidget {
                     imageAsset: "images/profile1.png",
                   ),
                   _buildDesignerCard(
+                    context,
                     name: "Jessica Bui",
                     sales: "10 Penjualan",
                     rating: 4.8,
@@ -74,10 +76,11 @@ class HomePage extends StatelessWidget {
                 TextButton(
                   onPressed: () {},
                   child: Text("Lihat semua", style: TextStyle(fontSize: 12)),
-                )
+                ),
               ],
             ),
             _buildTransactionCard(
+              context,
               name: "Kevin Durant",
               message: "telah menyelesaikan sebuah transaksi",
               rating: 5.0,
@@ -85,6 +88,7 @@ class HomePage extends StatelessWidget {
               imageAsset: "images/profile3.png",
             ),
             _buildTransactionCard(
+              context,
               name: "Ahmad",
               message: "telah menyelesaikan sebuah transaksi",
               rating: 4.0,
@@ -98,6 +102,7 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(height: 10),
             _buildFollowedCard(
+              context,
               username: "Rendy",
               time: "3 jam lalu",
               message:
@@ -106,7 +111,7 @@ class HomePage extends StatelessWidget {
                 "images/bca.png",
                 "images/garuda.png",
                 "images/gojek.png",
-                "images/pertamina.png"
+                "images/pertamina.png",
               ],
               profileImage: "images/profile5.png",
             ),
@@ -116,7 +121,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildDesignerCard({
+  Widget _buildDesignerCard(
+    BuildContext context, {
     required String name,
     required String sales,
     required double rating,
@@ -128,9 +134,11 @@ class HomePage extends StatelessWidget {
       margin: EdgeInsets.only(right: 12),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).dividerColor,
+        ), // Divider mengikuti tema
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        color: Theme.of(context).cardColor, // Background mengikuti tema
       ),
       child: Row(
         children: [
@@ -140,7 +148,14 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 6),
               Text(
                 followers,
-                style: TextStyle(fontSize: 10, color: Colors.black),
+                style: TextStyle(
+                  fontSize: 10,
+                  color:
+                      Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color, // Menggunakan warna teks sesuai tema
+                ),
               ),
             ],
           ),
@@ -149,63 +164,61 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color:
+                        Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.color, // Menggunakan warna teks sesuai tema
+                  ),
+                ),
                 SizedBox(height: 2),
-                Text(sales, style: TextStyle(fontSize: 11)),
+                Text(
+                  sales,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color:
+                        Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color, // Warna teks sesuai tema
+                  ),
+                ),
                 SizedBox(height: 4),
                 Row(
                   children: List.generate(5, (index) {
-                    return Icon(Icons.star, color: Colors.amber, size: 14);
+                    return Icon(
+                      Icons.star,
+                      color:
+                          Colors
+                              .amber, // Warna bintang tetap sama (tidak menggunakan tema)
+                      size: 14,
+                    );
                   }),
                 ),
-                Text(rating.toString(), style: TextStyle(fontSize: 11)),
+                Text(
+                  rating.toString(),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color:
+                        Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color, // Warna teks sesuai tema
+                  ),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTransactionCard({
-    required String name,
-    required String message,
-    required double rating,
-    required String sales,
-    required String imageAsset,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 6),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade100,
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(backgroundImage: AssetImage(imageAsset), radius: 25),
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("$name $message", style: TextStyle(fontSize: 13)),
-                Row(
-                  children: List.generate(5, (index) {
-                    return Icon(Icons.star, color: Colors.amber, size: 14);
-                  }),
-                ),
-                Text(sales, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFollowedCard({
+  Widget _buildFollowedCard(
+    BuildContext context, {
     required String username,
     required String time,
     required String message,
@@ -216,9 +229,9 @@ class HomePage extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,36 +240,134 @@ class HomePage extends StatelessWidget {
             children: [
               CircleAvatar(backgroundImage: AssetImage(profileImage)),
               SizedBox(width: 10),
-              Text(username, style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                username,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
               Spacer(),
-              Text(time, style: TextStyle(fontSize: 12, color: Colors.grey)),
-              Icon(Icons.more_vert),
+              Text(
+                time,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
+              ),
+              Icon(Icons.more_vert, color: Theme.of(context).iconTheme.color),
             ],
           ),
           SizedBox(height: 10),
-          Text(message),
+          Text(
+            message,
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+            ),
+          ),
           if (logos.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Wrap(
                 spacing: 10,
-                children: logos.map((logo) => Image.asset(logo, width: 50)).toList(),
+                children:
+                    logos.map((logo) => Image.asset(logo, width: 50)).toList(),
               ),
             ),
           SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.favorite_border, size: 20),
+              Icon(
+                Icons.favorite_border,
+                size: 20,
+                color: Theme.of(context).iconTheme.color,
+              ),
               SizedBox(width: 4),
-              Text("89"),
+              Text(
+                "89",
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
+              ),
               SizedBox(width: 16),
-              Icon(Icons.comment_outlined, size: 20),
+              Icon(
+                Icons.comment_outlined,
+                size: 20,
+                color: Theme.of(context).iconTheme.color,
+              ),
               SizedBox(width: 4),
-              Text("6"),
+              Text(
+                "6",
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
   }
+}
+
+Widget _buildTransactionCard(
+  BuildContext context, { // Menambahkan context sebagai parameter
+  required String name,
+  required String message,
+  required double rating,
+  required String sales,
+  required String imageAsset,
+}) {
+  return Container(
+    margin: EdgeInsets.symmetric(vertical: 6),
+    padding: EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      border: Border.all(
+        color: Theme.of(context).dividerColor,
+      ), // Divider sesuai tema
+      borderRadius: BorderRadius.circular(12),
+      color: Theme.of(context).cardColor, // Background sesuai tema
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(backgroundImage: AssetImage(imageAsset), radius: 25),
+        SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "$name $message",
+                style: TextStyle(
+                  fontSize: 13,
+                  color:
+                      Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.color, // Warna teks sesuai tema
+                ),
+              ),
+              Row(
+                children: List.generate(5, (index) {
+                  return Icon(
+                    Icons.star,
+                    color: Colors.amber, // Warna bintang tetap sama
+                    size: 14,
+                  );
+                }),
+              ),
+              Text(
+                sales,
+                style: TextStyle(
+                  fontSize: 11,
+                  color:
+                      Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey[600], // Warna teks sesuai tema
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
