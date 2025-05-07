@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider with ChangeNotifier {
-  // Default theme mode (light)
-  ThemeMode _themeMode = ThemeMode.light;
-
   // Constructor untuk memuat tema saat aplikasi pertama kali dijalankan
   ThemeProvider() {
     _loadTheme();
   }
+
+  // Default theme mode (light)
+  ThemeMode _themeMode = ThemeMode.light;
 
   // Getter untuk mengambil nilai themeMode
   ThemeMode get themeMode => _themeMode;
@@ -25,15 +25,15 @@ class ThemeProvider with ChangeNotifier {
 
   // Fungsi untuk memuat tema yang tersimpan dari SharedPreferences
   Future<void> _loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isDark = prefs.getBool('isDarkMode') ?? false;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool isDark = prefs.getBool('isDarkMode') ?? false;
     _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
     notifyListeners(); // Memberitahu widget agar merender ulang jika tema berubah
   }
 
   // Fungsi untuk menyimpan tema ke SharedPreferences
   Future<void> _saveTheme(bool isDark) async {
-    final prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isDarkMode', isDark); // Menyimpan pilihan tema
   }
 }

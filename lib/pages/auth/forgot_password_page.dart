@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../components/input_field_component.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
+  ForgotPasswordPage({super.key});
+
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
@@ -22,16 +25,18 @@ class ForgotPasswordPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               const SizedBox(height: 16),
-
               Center(
                 child: Text(
-                  "Ganti Sandi",
+                  'Ganti Sandi',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -39,23 +44,20 @@ class ForgotPasswordPage extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 48),
-
-              buildInputField(
+              // Nama pengguna
+              InputField(
                 icon: Icons.person,
                 hint: 'Nama pengguna',
                 controller: usernameController,
               ),
-
-              buildInputField(
+              // Email
+              InputField(
                 icon: Icons.email,
                 hint: 'Email',
                 controller: emailController,
               ),
-
               const SizedBox(height: 24),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -63,14 +65,15 @@ class ForgotPasswordPage extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text("Link Dikirim"),
-                        content: Text("Link reset password telah dikirim ke email kamu."),
+                        title: Text('Link Dikirim'),
+                        content: Text('Link reset password telah dikirim ke email kamu.'),
                         actions: [
                           TextButton(
-                            onPressed: () =>
-                                Navigator.popUntil(context, ModalRoute.withName('/')),
-                            child: Text("OK"),
-                          )
+                            onPressed: () {
+                              Navigator.popUntil(context, ModalRoute.withName('/login'));
+                            },
+                            child: Text('OK'),
+                          ),
                         ],
                       ),
                     );
@@ -79,40 +82,13 @@ class ForgotPasswordPage extends StatelessWidget {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.blue.shade900,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text("Kirim email"),
+                  child: Text('Kirim email'),
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildInputField({
-    required IconData icon,
-    required String hint,
-    required TextEditingController controller,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        border: Border.all(color: Colors.white),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: controller,
-        style: TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.white),
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.white70),
-          border: InputBorder.none,
         ),
       ),
     );

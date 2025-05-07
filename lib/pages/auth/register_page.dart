@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../components/input_field_component.dart';
 
 class RegisterPage extends StatelessWidget {
+  RegisterPage({super.key});
+
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -12,7 +15,7 @@ class RegisterPage extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF0D47A1), Color(0xFF1976D2)], // gradasi biru
+            colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -32,39 +35,33 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-
                 // Nama Pengguna
-                buildInputField(
+                InputField(
                   icon: Icons.person,
                   hint: 'Nama pengguna',
                   controller: usernameController,
                 ),
-
                 // Email
-                buildInputField(
+                InputField(
                   icon: Icons.email,
                   hint: 'Email',
                   controller: emailController,
                 ),
-
                 // Kata sandi
-                buildInputField(
+                InputField(
                   icon: Icons.lock,
                   hint: 'Kata sandi',
                   controller: passwordController,
                   obscureText: true,
                 ),
-
                 // Konfirmasi kata sandi
-                buildInputField(
+                InputField(
                   icon: Icons.lock_outline,
                   hint: 'Konfirmasi kata sandi',
                   controller: confirmPasswordController,
                   obscureText: true,
                 ),
-
                 const SizedBox(height: 24),
-
                 // Tombol Daftar
                 SizedBox(
                   width: double.infinity,
@@ -73,21 +70,23 @@ class RegisterPage extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 14),
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.blue.shade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () {
                       // Tambahkan validasi jika ingin
-                      Navigator.pushReplacementNamed(context, '/home');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Akun berhasil didaftar'),
+                          backgroundColor: Colors.green.shade800,
+                        ),
+                      );
+                      Navigator.pushReplacementNamed(context, '/login');
                     },
                     child: Text('Buat akun'),
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // Sudah punya akun
+                // Sudah punya akun - Start
                 Text(
                   'Sudah memiliki akun',
                   style: TextStyle(color: Colors.white),
@@ -97,46 +96,21 @@ class RegisterPage extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: BorderSide(color: Colors.white),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 32,
                     ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   child: Text('Masuk'),
                 ),
+                // Sudah punya akun - End
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildInputField({
-    required IconData icon,
-    required String hint,
-    required TextEditingController controller,
-    bool obscureText = false,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        border: Border.all(color: Colors.white),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        style: TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.white),
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.white70),
-          border: InputBorder.none,
         ),
       ),
     );
