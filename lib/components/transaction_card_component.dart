@@ -16,12 +16,14 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).dividerColor),
+        border: Border.all(color: theme.dividerColor),
         borderRadius: BorderRadius.circular(12),
-        color: Theme.of(context).cardColor,
+        color: theme.cardColor,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,16 +32,13 @@ class TransactionCard extends StatelessWidget {
             backgroundImage: AssetImage(imageAsset),
             radius: 24,
           ),
-          SizedBox(width: 10),
+          SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RichText(
                 text: TextSpan(
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyLarge!.color,
-                    fontSize: 13,
-                  ),
+                  style: theme.textTheme.bodyMedium,
                   children: [
                     TextSpan(
                       text: name,
@@ -49,25 +48,20 @@ class TransactionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 2),
+              SizedBox(height: 8),
               Row(
                 children: [
-                  Row(
-                    children: List.generate(rating.ceil(), (index) {
-                      return Icon(
-                        Icons.star,
-                        color: Colors.amber, // Warna bintang tetap sama (tidak menggunakan tema)
-                        size: 14,
-                      );
-                    }),
-                  ),
-                  SizedBox(width: 4),
+                  ...List.generate(rating.ceil(), (index) {
+                    return Icon(
+                      Icons.star,
+                      color: Colors.amber,
+                      size: 14,
+                    );
+                  }),
+                  SizedBox(width: 6),
                   Text(
                     rating.toString(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:Theme.of(context).textTheme.bodyMedium!.color,
-                    ),
+                    style: theme.textTheme.labelSmall,
                   ),
                 ],
               ),

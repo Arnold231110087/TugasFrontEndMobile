@@ -22,12 +22,14 @@ class FollowedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).dividerColor),
+        border: Border.all(color: theme.dividerColor),
         borderRadius: BorderRadius.circular(12),
-        color: Theme.of(context).cardColor,
+        color: theme.cardColor,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,33 +37,31 @@ class FollowedCard extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(backgroundImage: AssetImage(profileImage)),
-              SizedBox(width: 10),
+              SizedBox(width: 12),
               Text(
                 username,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyLarge!.color,
+                  fontSize: theme.textTheme.bodyMedium!.fontSize,
+                  color: theme.textTheme.bodyMedium!.color,
                 ),
               ),
               Spacer(),
               Text(
                 time,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).textTheme.bodyMedium!.color,
-                ),
+                style: theme.textTheme.labelSmall,
               ),
               SizedBox(width: 16),
               Icon(
                 Icons.more_vert,
-                color: Theme.of(context).iconTheme.color,
+                color: theme.textTheme.bodySmall!.color,
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           Text(
             message,
-            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color),
+            style: TextStyle(color: theme.textTheme.bodyLarge!.color),
           ),
           if (logos.isNotEmpty)
             Padding(
@@ -71,29 +71,29 @@ class FollowedCard extends StatelessWidget {
                 children: logos.map((logo) => Image.asset(logo, width: 50)).toList(),
               ),
             ),
-          SizedBox(height: 16),
+          SizedBox(height: 32),
           Row(
             children: [
               Icon(
                 Icons.favorite_border,
                 size: 20,
-                color: Theme.of(context).iconTheme.color,
+                color: theme.textTheme.bodySmall!.color,
               ),
               SizedBox(width: 4),
               Text(
                 like,
-                style: TextStyle(color: Theme.of(context).textTheme.bodyMedium!.color),
+                style: theme.textTheme.bodyMedium,
               ),
               SizedBox(width: 24),
               Icon(
                 Icons.comment_outlined,
                 size: 20,
-                color: Theme.of(context).iconTheme.color,
+                color: theme.textTheme.bodySmall!.color,
               ),
               SizedBox(width: 4),
               Text(
-                '6',
-                style: TextStyle(color: Theme.of(context).textTheme.bodyMedium!.color),
+                comment,
+                style: theme.textTheme.bodyMedium,
               ),
             ],
           ),

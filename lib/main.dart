@@ -29,39 +29,55 @@ class MyApp extends StatelessWidget {
       title: 'LogoDesain',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
-        scaffoldBackgroundColor: Colors.white,
-        cardColor: Colors.white,
-        dividerColor: Colors.grey.shade300,
+        scaffoldBackgroundColor: Color(0xFFFFFFFF),
+        cardColor: Color(0xFFF9FAFB),
+        dividerColor: Color(0xFFD1E7FF),
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blue.shade800,
-          foregroundColor: Colors.white,
+          elevation: 0,
+          backgroundColor: Color(0xFF1E40AF),
+          foregroundColor: Color(0xFFFFFFFF),
         ),
         textTheme: TextTheme(
-          displayLarge: TextStyle(color: Colors.white), // Teks putih di container gelap
-          bodyLarge: TextStyle(color: Colors.black), // Untuk teks utama
-          bodyMedium: TextStyle(color: Colors.black54), // Teks lebih kecil
-          titleLarge: TextStyle(color: Colors.black), // Judul besar
-          titleMedium: TextStyle(color: Colors.black), // Judul medium
+          displayLarge: TextStyle(color: Color(0xFFFFFFFF), fontSize: 18),
+          displayMedium: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),
+          displaySmall: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
+          headlineLarge: TextStyle(color: Color(0xFF2563EB), fontSize: 18),
+          headlineMedium: TextStyle(color: Color(0xFF2563EB), fontSize: 14),
+          headlineSmall: TextStyle(color: Color(0xFF2563EB), fontSize: 12),
+          bodyLarge: TextStyle(color: Color(0xFF1A1A1A), fontSize: 18),
+          bodyMedium: TextStyle(color: Color(0xFF1A1A1A), fontSize: 14),
+          bodySmall: TextStyle(color: Color(0xFF1A1A1A), fontSize: 12),
+          labelLarge: TextStyle(color: Color(0xFF7A7A7A), fontSize: 18),
+          labelMedium: TextStyle(color: Color(0xFF7A7A7A), fontSize: 14),
+          labelSmall: TextStyle(color: Color(0xFF7A7A7A), fontSize: 12),
         ),
       ),
       darkTheme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
-        cardColor: Color(0xFF121212),
-        dividerColor: Color(0xFF121212),
+        scaffoldBackgroundColor: Color(0xFF121212),
+        cardColor: Color(0xFF1A1A1A),
+        dividerColor: Color(0xFF2C2C2C),
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          elevation: 0,
+          backgroundColor: Color(0xFF121212),
+          foregroundColor: Color(0xFFE0E0E0),
         ),
         textTheme: TextTheme(
-          displayLarge: TextStyle(color: Colors.white), // Teks hitam di container terang
-          bodyLarge: TextStyle(color: Colors.white), // Teks putih di dark mode
-          bodyMedium: TextStyle(color: Color(0xFFFAFAFA)), // Teks lebih kecil putih
-          titleLarge: TextStyle(color: Colors.white), // Judul besar putih
-          titleMedium: TextStyle(color: Color(0xFFFAFAFA)), // Judul medium putih
+          displayLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
+          displayMedium: TextStyle(color: Color(0xFFE0E0E0), fontSize: 14),
+          displaySmall: TextStyle(color: Color(0xFFE0E0E0), fontSize: 12),
+          headlineLarge: TextStyle(color: Color(0xFF8AB4F8), fontSize: 18),
+          headlineMedium: TextStyle(color: Color(0xFF8AB4F8), fontSize: 14),
+          headlineSmall: TextStyle(color: Color(0xFF8AB4F8), fontSize: 12),
+          bodyLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
+          bodyMedium: TextStyle(color: Color(0xFFE0E0E0), fontSize: 14),
+          bodySmall: TextStyle(color: Color(0xFFE0E0E0), fontSize: 12),
+          labelLarge: TextStyle(color: Color(0xFF8A8A8A), fontSize: 18),
+          labelMedium: TextStyle(color: Color(0xFF8A8A8A), fontSize: 14),
+          labelSmall: TextStyle(color: Color(0xFF8A8A8A), fontSize: 12),
         ),
       ),
       themeMode: themeProvider.themeMode,
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
         '/': (context) => MainNavigation(),
         '/login': (context) => LoginPage(),
@@ -98,13 +114,15 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.blue.shade900,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: theme.textTheme.headlineSmall!.color,
+        unselectedItemColor: theme.textTheme.labelSmall!.color,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,

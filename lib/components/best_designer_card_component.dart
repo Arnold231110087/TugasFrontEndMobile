@@ -18,30 +18,29 @@ class BestDesignerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Container(
       width: 260,
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).dividerColor),
+        border: Border.all(color: theme.dividerColor),
         borderRadius: BorderRadius.circular(12),
-        color: Theme.of(context).cardColor,
+        color: theme.cardColor,
       ),
       child: Row(
         children: [
           Column(
             children: [
               CircleAvatar(backgroundImage: AssetImage(imageAsset), radius: 28),
-              SizedBox(height: 8),
+              SizedBox(height: 12),
               Text(
                 followers,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Theme.of(context).textTheme.bodyMedium!.color,
-                ),
+                style: theme.textTheme.labelSmall,
               ),
             ],
           ),
-          SizedBox(width: 12),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,18 +49,16 @@ class BestDesignerCard extends StatelessWidget {
                   name,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: Theme.of(context).textTheme.bodyLarge!.color,
+                    fontSize: theme.textTheme.bodyMedium!.fontSize,
+                    color: theme.textTheme.bodyMedium!.color,
                   ),
                 ),
+                SizedBox(height: 2),
                 Text(
                   sales,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).textTheme.bodyMedium!.color,
-                  ),
+                  style: theme.textTheme.labelSmall,
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: 8),
                 Row(
                   children: [
                     Row(
@@ -73,13 +70,10 @@ class BestDesignerCard extends StatelessWidget {
                         );
                       }),
                     ),
-                    SizedBox(width: 4),
+                    SizedBox(width: 6),
                     Text(
                       rating.toString(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color:Theme.of(context).textTheme.bodyMedium!.color,
-                      ),
+                      style: theme.textTheme.labelSmall,
                     ),
                   ],
                 ),

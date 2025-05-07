@@ -8,18 +8,20 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
           'LOGODESAIN',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).textTheme.displayLarge!.color,
-            fontSize: 20,
+            fontSize: theme.textTheme.displayLarge!.fontSize,
+            color: theme.textTheme.displayLarge!.color,
           ),
         ),
         actions: [
@@ -27,7 +29,7 @@ class HomePage extends StatelessWidget {
             padding: const EdgeInsets.only(right: 16.0),
             child: Icon(
               Icons.chat_bubble_outline,
-              color: Colors.white,
+              color: theme.textTheme.displaySmall!.color
             ),
           ),
         ],
@@ -43,18 +45,19 @@ class HomePage extends StatelessWidget {
             Text(
               'Desainer terbaik',
               style: TextStyle(
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontSize: theme.textTheme.bodyLarge!.fontSize,
+                color: theme.textTheme.bodyLarge!.color,
               ),
             ),
-            SizedBox(height: 4),
+            SizedBox(height: 6),
             Text(
               'Desainer dengan penjualan terbanyak pada Bulan Desember',
-              style: TextStyle(fontSize: 12),
+              style: theme.textTheme.bodySmall,
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 24),
             SizedBox(
-              height: 104,
+              height: 119,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
@@ -65,7 +68,7 @@ class HomePage extends StatelessWidget {
                     followers: '198 Pengikut',
                     imageAsset: 'images/profile1.png',
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(width: 20),
                   BestDesignerCard(
                     name: 'Jessica Bui',
                     sales: '10 Penjualan',
@@ -76,46 +79,51 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 48),
+            SizedBox(height: 60),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Transaksi terkini',
                   style: TextStyle(
-                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    fontSize: theme.textTheme.bodyLarge!.fontSize,
+                    color: theme.textTheme.bodyLarge!.color,
                   ),
                 ),
                 TextButton(
                   onPressed: () {},
-                  child: Text('Lihat semua', style: TextStyle(fontSize: 12)),
+                  child: Text(
+                    'Lihat semua',
+                    style: theme.textTheme.headlineSmall,
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 24),
             TransactionCard(
               name: 'Kevin Durant',
               message: 'telah menyelesaikan sebuah transaksi',
               rating: 5.0,
               imageAsset: 'images/profile3.png',
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 16),
             TransactionCard(
               name: 'Ahmad',
               message: 'telah menyelesaikan sebuah transaksi',
               rating: 4.0,
               imageAsset: 'images/profile4.png',
             ),
-            SizedBox(height: 48),
+            SizedBox(height: 60),
             Text(
               'Akun yang anda ikuti',
               style: TextStyle(
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontSize: theme.textTheme.bodyLarge!.fontSize,
+                color: theme.textTheme.bodyLarge!.color,
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 24),
             FollowedCard(
               username: 'Rendy',
               time: '3 jam lalu',
