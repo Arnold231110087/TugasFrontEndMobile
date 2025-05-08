@@ -6,8 +6,8 @@ class PostCard extends StatelessWidget {
   final String message;
   final List<String> logos;
   final String profileImage;
-  final String like;
-  final String comment;
+  final int like;
+  final int comment;
 
   const PostCard({
     super.key,
@@ -81,7 +81,7 @@ class PostCard extends StatelessWidget {
               ),
               SizedBox(width: 4),
               Text(
-                like,
+                like.toString(),
                 style: theme.textTheme.bodyMedium,
               ),
               SizedBox(width: 24),
@@ -92,7 +92,7 @@ class PostCard extends StatelessWidget {
               ),
               SizedBox(width: 4),
               Text(
-                comment,
+                comment.toString(),
                 style: theme.textTheme.bodyMedium,
               ),
             ],

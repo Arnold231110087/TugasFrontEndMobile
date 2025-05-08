@@ -11,8 +11,8 @@ class PostPage extends StatelessWidget {
       'message': 'Ini adalah postingan keduaku...',
       'logos': [],
       'profileImage': 'images/profile1.png',
-      'like': '2',
-      'comment': '0',
+      'like': 2,
+      'comment': 0,
     },
     {
       'username' : 'Valerio Liuz Kienata',
@@ -20,8 +20,8 @@ class PostPage extends StatelessWidget {
       'message': 'Hello World!!! Ini adalah postingan pertamaku...',
       'logos': [],
       'profileImage': 'images/profile1.png',
-      'like': '1',
-      'comment': '0',
+      'like': 1,
+      'comment': 0,
     },
   ];
 
