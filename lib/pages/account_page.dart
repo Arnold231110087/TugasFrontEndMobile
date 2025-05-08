@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
-import '../sales_page.dart';
 import 'post_page.dart';
+import 'sales_page.dart';
 import '../components/drawer_section_component.dart';
 import '../components/account_page_section_button_component.dart';
 
@@ -52,7 +52,7 @@ class _AccountPageState extends State<AccountPage> {
   ];
 
   final Map<String, double> stats = {
-    'penjualan': 2,
+    'penjualan': 1,
     'pengikut': 2,
     'mengikuti': 3,
   };
@@ -72,7 +72,7 @@ class _AccountPageState extends State<AccountPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          'AKUN',
+          'PROFIL',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: theme.textTheme.displayLarge!.fontSize,
