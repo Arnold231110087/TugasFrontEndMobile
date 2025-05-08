@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:logo_marketplace/components/best_designer_card_component.dart';
-import 'package:logo_marketplace/components/followed_card_component.dart';
-import 'package:logo_marketplace/components/transaction_card_component.dart';
+import '../components/best_designer_card_component.dart';
+import '../components/post_card_component.dart';
+import '../components/transaction_card_component.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -24,10 +24,14 @@ class HomePage extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(
-              Icons.chat_bubble_outline,
-              color: theme.textTheme.displaySmall!.color
+            padding: const EdgeInsets.only(right: 4),
+            child: IconButton(
+              icon: Icon(
+                Icons.chat_bubble_outline,
+                color: theme.textTheme.displaySmall!.color
+              ),
+              color: theme.textTheme.displaySmall!.color,
+              onPressed: () {},
             ),
           ),
         ],
@@ -122,7 +126,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24),
-            FollowedCard(
+            PostCard(
               username: 'Rendy',
               time: '3 jam lalu',
               message: 'Beberapa logo yang pernah aku kerjakan untuk giant companies yang ada di Indonesia',

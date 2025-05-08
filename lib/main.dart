@@ -8,7 +8,7 @@ import 'pages/home_page.dart';
 import 'pages/search_page.dart';
 import 'pages/upload_page.dart';
 import 'pages/notification_page.dart';
-import 'account_page.dart';
+import 'pages/account_page.dart';
 
 void main() {
   runApp(
@@ -77,7 +77,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeProvider.themeMode,
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
         '/': (context) => MainNavigation(),
         '/login': (context) => LoginPage(),

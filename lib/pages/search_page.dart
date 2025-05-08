@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:logo_marketplace/components/search_account_component.dart';
+import '../components/search_account_component.dart';
 
 class SearchPage extends StatelessWidget {
   SearchPage({super.key});
@@ -75,7 +75,7 @@ class SearchPage extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 12),
-              ...randomAccounts.map((account) {
+              ...searchedAccounts.map((account) {
                 return SearchAccount(
                   name: account['name'],
                   followers: account['followers'],
