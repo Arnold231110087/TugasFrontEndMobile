@@ -20,15 +20,13 @@ class NotificationPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.appBarTheme.backgroundColor,
-        elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
           'NOTIFIKASI',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).textTheme.displayLarge!.color,
-            fontSize: 20,
+            fontSize: theme.textTheme.displayLarge!.fontSize,
+            color: theme.textTheme.displayLarge!.color,
           ),
         ),
       ),

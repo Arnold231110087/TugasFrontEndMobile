@@ -26,7 +26,7 @@ class NotificationCard extends StatelessWidget {
         crossAxisAlignment: comment != null ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
           CircleAvatar(backgroundImage: AssetImage(imageAsset)),
-          SizedBox(width: 12),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,10 +37,7 @@ class NotificationCard extends StatelessWidget {
                     Expanded(
                       child: RichText(
                         text: TextSpan(
-                          style: TextStyle(
-                            color: theme.textTheme.bodyLarge!.color,
-                            fontSize: 13,
-                          ),
+                          style: theme.textTheme.bodyMedium,
                           children: [
                             TextSpan(
                               text: name,
@@ -54,10 +51,7 @@ class NotificationCard extends StatelessWidget {
                     SizedBox(width: 16),
                     Text(
                       time,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: theme.textTheme.bodyMedium!.color,
-                      ),
+                      style: theme.textTheme.labelSmall,
                     ),
                   ],
                 ),
@@ -65,7 +59,7 @@ class NotificationCard extends StatelessWidget {
                   SizedBox(height: 8),
                   Text(
                     comment!,
-                    style: TextStyle(fontSize: 13),
+                    style: theme.textTheme.labelMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

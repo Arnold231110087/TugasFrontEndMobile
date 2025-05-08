@@ -12,15 +12,13 @@ class UploadPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.appBarTheme.backgroundColor,
-        elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
           'UNGGAH',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).textTheme.displayLarge!.color,
-            fontSize: 20,
+            fontSize: theme.textTheme.displayLarge!.fontSize,
+            color: theme.textTheme.displayLarge!.color,
           ),
         ),
       ),
@@ -33,14 +31,17 @@ class UploadPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(backgroundImage: AssetImage('images/profile1.png')),
+                CircleAvatar(
+                  backgroundImage: AssetImage('images/profile1.png'),
+                  radius: 24,
+                ),
                 SizedBox(width: 16),
                 Text(
                   'Valerio Liuz Kienata',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: theme.textTheme.bodyLarge!.color,
+                    fontSize: theme.textTheme.bodyMedium!.fontSize,
+                    color: theme.textTheme.bodyMedium!.color,
                   ),
                 ),
               ],
@@ -51,10 +52,10 @@ class UploadPage extends StatelessWidget {
                 maxLines: null,
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
-                style: TextStyle(color: theme.textTheme.bodyLarge!.color),
+                style: theme.textTheme.bodyMedium,
                 decoration: InputDecoration(
                   hintText: 'Tulis Sesuatu...',
-                  hintStyle: TextStyle(color: theme.hintColor),
+                  hintStyle: theme.textTheme.labelMedium,
                   filled: true,
                   fillColor: theme.cardColor,
                   contentPadding: EdgeInsets.all(20),
@@ -70,8 +71,9 @@ class UploadPage extends StatelessWidget {
               onPressed: () {},
               style: TextButton.styleFrom(
                 backgroundColor: themeProvider.isDarkMode ? theme.cardColor : theme.appBarTheme.backgroundColor,
-                foregroundColor: theme.textTheme.displayLarge!.color,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                foregroundColor: theme.textTheme.displaySmall!.color,
+                textStyle: theme.textTheme.displayMedium,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 minimumSize: const Size.fromHeight(48),
               ),
               child: const Text('Unggah'),
