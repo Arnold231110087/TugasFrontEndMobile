@@ -19,27 +19,31 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0,
         automaticallyImplyLeading: false,
         title: Container(
           height: 40,
           padding: EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(20),
           ),
           child: TextField(
+            maxLines: null,
+            expands: true,
+            textAlignVertical: TextAlignVertical.center,
+            style: theme.textTheme.bodyMedium,
             decoration: InputDecoration(
               prefixIcon: Icon(
                 Icons.search,
-                color: Theme.of(context).iconTheme.color,
+                color: theme.textTheme.bodySmall!.color,
               ),
               hintText: 'Cari',
-              hintStyle: TextStyle(color: Theme.of(context).hintColor),
+              hintStyle: theme.textTheme.labelMedium,
               border: InputBorder.none,
             ),
           ),
@@ -58,14 +62,15 @@ class SearchPage extends StatelessWidget {
                 children: [
                   Text(
                     'Akun yang pernah dicari',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: theme.textTheme.bodyMedium!.fontSize,
+                      color: theme.textTheme.bodyMedium!.color,
+                    ),
                   ),
                   Text(
                     'Lihat semua',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: theme.textTheme.headlineSmall,
                   ),
                 ],
               ),
@@ -79,7 +84,7 @@ class SearchPage extends StatelessWidget {
                   rating: account['rating'],
                 );
               }),
-              SizedBox(height: 32),
+              SizedBox(height: 36),
               Text(
                 'Akun acak',
                 style: TextStyle(fontWeight: FontWeight.bold),

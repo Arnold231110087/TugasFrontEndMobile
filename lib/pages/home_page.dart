@@ -13,8 +13,6 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.appBarTheme.backgroundColor,
-        elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
           'LOGODESAIN',

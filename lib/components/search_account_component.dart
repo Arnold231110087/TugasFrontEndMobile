@@ -18,17 +18,18 @@ class SearchAccount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
-            radius: 22,
+            radius: 24,
             backgroundImage: AssetImage('images/profile1.png'),
           ),
-          SizedBox(width: 12),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,26 +38,26 @@ class SearchAccount extends StatelessWidget {
                   name,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.bodyLarge!.color,
+                    fontSize: theme.textTheme.bodyMedium!.fontSize,
+                    color: theme.textTheme.bodyMedium!.color,
                   ),
                 ),
+                SizedBox(height: 2),
                 Text(
                   followers,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).textTheme.bodyMedium!.color,
-                  ),
+                  style: theme.textTheme.labelSmall,
                 ),
-                SizedBox(height: 4),
+                if (isFriend || followsYou)
+                  SizedBox(height: 8),
                 if (isFriend)
                   Text(
                     'Teman',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    style: theme.textTheme.labelSmall,
                   ),
                 if (followsYou)
                   Text(
                     'Mengikuti anda',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    style: theme.textTheme.labelSmall,
                   ),
               ],
             ),
@@ -64,14 +65,11 @@ class SearchAccount extends StatelessWidget {
           if (rating != null)
             Row(
               children: [
-                Icon(Icons.star, color: Colors.amber, size: 16),
+                Icon(Icons.star, color: Colors.amber, size: 14),
                 SizedBox(width: 2),
                 Text(
                   rating.toString(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).textTheme.bodyMedium!.color,
-                  ),
+                  style: theme.textTheme.bodySmall,
                 ),
               ],
             ),

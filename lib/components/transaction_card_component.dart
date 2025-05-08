@@ -61,7 +61,7 @@ class TransactionCard extends StatelessWidget {
                   SizedBox(width: 6),
                   Text(
                     rating.toString(),
-                    style: theme.textTheme.labelSmall,
+                    style: theme.textTheme.bodySmall,
                   ),
                 ],
               ),
