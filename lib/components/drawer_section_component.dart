@@ -34,7 +34,15 @@ class DrawerSection extends StatelessWidget {
               tile['icon'],
               color: theme.textTheme.bodyMedium!.color,
             ),
-            onTap: tile['onTap'] ?? () {},
+            onTap: () {
+              if (tile['page'] != null) {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => tile['page'])
+                );
+              }
+            },
           );
         }),
       ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import 'edit_profile_page.dart';
 import 'post_page.dart';
 import 'sales_page.dart';
 import '../components/drawer_section_component.dart';
@@ -20,7 +21,7 @@ class _AccountPageState extends State<AccountPage> {
     {
       'section': 'Akun',
       'tiles': [
-        {'title': 'Ubah profil', 'icon': Icons.person},
+        {'title': 'Ubah profil', 'icon': Icons.person, 'page': EditProfilePage()},
         {'title': 'Ubah kata sandi', 'icon': Icons.lock},
         {'title': 'Privasi', 'icon': Icons.privacy_tip},
         {'title': 'Notifikasi', 'icon': Icons.notifications},
