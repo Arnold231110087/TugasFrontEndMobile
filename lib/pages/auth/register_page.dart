@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../components/input_field_component.dart';
+import '../../components/input_field_2_component.dart';
 
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});
@@ -36,26 +36,26 @@ class RegisterPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 // Nama Pengguna
-                InputField(
+                InputField2(
                   icon: Icons.person,
                   hint: 'Nama pengguna',
                   controller: usernameController,
                 ),
                 // Email
-                InputField(
+                InputField2(
                   icon: Icons.email,
                   hint: 'Email',
                   controller: emailController,
                 ),
                 // Kata sandi
-                InputField(
+                InputField2(
                   icon: Icons.lock,
                   hint: 'Kata sandi',
                   controller: passwordController,
                   obscureText: true,
                 ),
                 // Konfirmasi kata sandi
-                InputField(
+                InputField2(
                   icon: Icons.lock_outline,
                   hint: 'Konfirmasi kata sandi',
                   controller: confirmPasswordController,

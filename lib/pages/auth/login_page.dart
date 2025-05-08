@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../components/input_field_component.dart';
+import '../../components/input_field_2_component.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -52,13 +52,13 @@ class LoginPage extends StatelessWidget {
                 // Logo - End
                 const SizedBox(height: 32),
                 // Email input
-                InputField(
+                InputField2(
                   icon: Icons.email,
                   hint: 'Email',
                   controller: emailController,
                 ),
                 // Password input
-                InputField(
+                InputField2(
                   icon: Icons.lock,
                   hint: 'Kata sandi',
                   controller: passwordController,

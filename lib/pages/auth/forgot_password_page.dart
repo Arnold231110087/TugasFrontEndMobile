@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../components/input_field_component.dart';
+import '../../components/input_field_2_component.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   ForgotPasswordPage({super.key});
@@ -46,13 +46,13 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               // Nama pengguna
-              InputField(
+              InputField2(
                 icon: Icons.person,
                 hint: 'Nama pengguna',
                 controller: usernameController,
               ),
               // Email
-              InputField(
+              InputField2(
                 icon: Icons.email,
                 hint: 'Email',
                 controller: emailController,
