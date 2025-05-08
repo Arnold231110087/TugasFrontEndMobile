@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class FollowedCard extends StatelessWidget {
+class PostCard extends StatelessWidget {
   final String username;
   final String time;
   final String message;
@@ -9,7 +9,7 @@ class FollowedCard extends StatelessWidget {
   final String like;
   final String comment;
 
-  const FollowedCard({
+  const PostCard({
     super.key,
     required this.username,
     required this.time,
