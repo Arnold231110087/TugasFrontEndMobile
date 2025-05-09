@@ -17,18 +17,20 @@ class InputField1 extends StatelessWidget {
     return TextField(
       controller: controller,
       style: theme.textTheme.bodyMedium,
+      cursorColor: theme.textTheme.headlineSmall!.color,
       decoration: InputDecoration(
         fillColor: theme.scaffoldBackgroundColor,
         labelText: label,
         labelStyle: theme.textTheme.labelMedium,
         focusColor: theme.textTheme.headlineSmall!.color,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+        border: UnderlineInputBorder(
           borderSide: BorderSide(color: theme.dividerColor),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.textTheme.headlineSmall!.color!),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            width: 2,
+            color: theme.textTheme.headlineSmall!.color!,
+          ),
         ),
       ),
     );

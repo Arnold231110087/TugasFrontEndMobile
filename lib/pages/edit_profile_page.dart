@@ -52,22 +52,22 @@ class EditProfilePage extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 40),
           InputField1(
             label: 'Nama',
             controller: nameController,
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           InputField1(
             label: 'Email',
             controller: emailController,
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           InputField1(
             label: 'Bio',
             controller: bioController,
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 40),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();

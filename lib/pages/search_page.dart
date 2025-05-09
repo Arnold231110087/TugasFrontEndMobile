@@ -37,6 +37,7 @@ class SearchPage extends StatelessWidget {
             expands: true,
             textAlignVertical: TextAlignVertical.center,
             style: theme.textTheme.bodyMedium,
+            cursorColor: theme.textTheme.headlineSmall!.color,
             decoration: InputDecoration(
               prefixIcon: Icon(
                 Icons.search,

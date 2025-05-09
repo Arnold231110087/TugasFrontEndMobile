@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../components/chat_detail_page.dart';
 import '../components/chat_card_component.dart';
 
 class ChatPage extends StatefulWidget {
@@ -61,18 +62,33 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: _isSearching
-        ? TextField(
-            controller: _searchController,
-            autofocus: true,
-            style: theme.textTheme.displayMedium,
-            cursorColor: theme.textTheme.displaySmall!.color,
-            decoration: InputDecoration(
-              hintText: 'Cari...',
-              hintStyle: theme.textTheme.labelMedium,
-              border: InputBorder.none,
-            ),
-            onChanged: (_) => setState(() {}),
-          )
+          ? Container(
+              height: 40,
+              padding: EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TextField(
+                controller: _searchController,
+                autofocus: true,
+                maxLines: null,
+                expands: true,
+                textAlignVertical: TextAlignVertical.center,
+                style: theme.textTheme.bodyMedium,
+                cursorColor: theme.textTheme.headlineSmall!.color,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: theme.textTheme.bodySmall!.color,
+                  ),
+                  hintText: 'Cari',
+                  hintStyle: theme.textTheme.labelMedium,
+                  border: InputBorder.none,
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            )
           : Text(
               'OBROLAN',
               style: TextStyle(
@@ -114,14 +130,24 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: filteredChats.length,
         itemBuilder: (context, index) {
           final Map<String, dynamic> chat = filteredChats[index];
-          return ChatCard(chat: chat);
+          return ChatCard(
+            chat: chat,
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ChatDetailPage(chat: chat)),
+              );
+
+              setState(() {
+                _isSearching = false;
+                _searchController.clear();
+              });
+            }
+          );
         },
       ),
     );
