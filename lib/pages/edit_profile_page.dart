@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:logo_marketplace/components/input_field_1_component.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../components/input_field_1_component.dart';
 
 class EditProfilePage extends StatelessWidget {
   EditProfilePage({super.key});

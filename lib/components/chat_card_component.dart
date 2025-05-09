@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:logo_marketplace/utils/rupiah_format.dart';
+import '../utils/rupiah_format.dart';
 
 class ChatCard extends StatelessWidget {
   final Map<String, dynamic> chat;
