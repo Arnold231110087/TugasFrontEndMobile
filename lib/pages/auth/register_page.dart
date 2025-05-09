@@ -11,6 +11,8 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -76,7 +78,10 @@ class RegisterPage extends StatelessWidget {
                       // Tambahkan validasi jika ingin
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Akun berhasil didaftar'),
+                          content: Text(
+                            'Akun berhasil didaftar',
+                            style: theme.textTheme.displayMedium,
+                          ),
                           backgroundColor: Colors.green.shade800,
                         ),
                       );

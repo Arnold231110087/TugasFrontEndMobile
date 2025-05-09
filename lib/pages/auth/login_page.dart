@@ -9,6 +9,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -84,7 +86,10 @@ class LoginPage extends StatelessWidget {
                       if (email.isEmpty || password.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Email dan password tidak boleh kosong'),
+                            content: Text(
+                              'Email dan password tidak boleh kosong',
+                              style: theme.textTheme.displayMedium,
+                            ),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -94,7 +99,10 @@ class LoginPage extends StatelessWidget {
                       if (!RegExp(emailRegex).hasMatch(email)) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Email tidak valid'),
+                            content: Text(
+                              'Email tidak valid',
+                              style: theme.textTheme.displayMedium,
+                            ),
                             backgroundColor: Colors.red,
                           ),
                         );

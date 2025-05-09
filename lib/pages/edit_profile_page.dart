@@ -72,7 +72,13 @@ class EditProfilePage extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profil berhasil disimpan')),
+                SnackBar(
+                  content: Text(
+                    'Profil berhasil disimpan',
+                    style: theme.textTheme.displayMedium,
+                  ),
+                  backgroundColor: Colors.green.shade800,
+                ),
               );
             },
             style: TextButton.styleFrom(
