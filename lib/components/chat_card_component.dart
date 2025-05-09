@@ -18,13 +18,14 @@ class ChatCard extends StatelessWidget {
     if (lastChat['sender'] == 'system') {
       final String amount = rupiahFormat(lastChat['amount'] as int);
       final String sender = lastChat['by'] == 'user' ? chat['username'] : 'Anda';
+      final String receiver = lastChat['by'] == 'user' ? 'Anda' : chat['username'];
 
       if (lastChat['type'] == 'proposal') {
         message = '$sender mengirimkan pengajuan senilai $amount';
       } else if (lastChat['type'] == 'rejected') {
-        message = '$sender menolak pengajuan senilai $amount';
+        message = '$receiver menolak pengajuan senilai $amount';
       } else if (lastChat['type'] == 'accepted') {
-        message = '$sender menerima pengajuan senilai $amount';
+        message = '$receiver menerima pengajuan senilai $amount';
       } else {
         message = lastChat['message'];
       }

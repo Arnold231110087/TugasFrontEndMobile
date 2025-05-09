@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/theme_provider.dart';
 
 class UploadPage extends StatelessWidget {
   const UploadPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
@@ -70,7 +67,7 @@ class UploadPage extends StatelessWidget {
             TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(
-                backgroundColor: themeProvider.isDarkMode ? theme.cardColor : theme.appBarTheme.backgroundColor,
+                backgroundColor: theme.textTheme.headlineSmall!.color,
                 foregroundColor: theme.textTheme.displaySmall!.color,
                 textStyle: theme.textTheme.displayMedium,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
