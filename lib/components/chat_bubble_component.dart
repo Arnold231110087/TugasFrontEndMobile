@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../pages/bank_page.dart';
 import '../utils/rupiah_format.dart';
 
 class ChatBubble extends StatefulWidget {
@@ -63,7 +64,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 text: 'menolak',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.red,
+                  color: Colors.red.shade800,
                 ),
               ),
               TextSpan(text: ' transaksi dari '),
@@ -142,7 +143,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    color: Colors.red,
+                                    color: Colors.red.shade800,
                                   ),
                                   child: Text('Tolak', style: theme.textTheme.displayMedium),
                               ),
@@ -151,10 +152,17 @@ class _ChatBubbleState extends State<ChatBubble> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  chat['type'] = 'accepted';
-                                });
+                              onTap: () async {
+                                final bool? payed = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const BankPage()),
+                                );
+
+                                if (payed == true) {
+                                  setState(() {
+                                    chat['type'] = 'accepted';
+                                  });
+                                }
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(vertical: 8),
