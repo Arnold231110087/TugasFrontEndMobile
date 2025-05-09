@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/best_designer_card_component.dart';
 import '../components/post_card_component.dart';
 import '../components/transaction_card_component.dart';
+import 'chat_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -31,7 +32,12 @@ class HomePage extends StatelessWidget {
                 color: theme.textTheme.displaySmall!.color
               ),
               color: theme.textTheme.displaySmall!.color,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatPage()),
+                );
+              },
             ),
           ),
         ],
