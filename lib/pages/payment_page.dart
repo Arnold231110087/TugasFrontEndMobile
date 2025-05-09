@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/rupiah_format.dart';
+import 'payment_success_page.dart';
 import '../components/payment_option.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -85,10 +86,10 @@ class _BankPageState extends State<PaymentPage> {
               width: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (_) => PaymentDetailPage(category: selected['category']!)),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PaymentSuccessPage()),
+                  );
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: theme.textTheme.headlineSmall!.color,
