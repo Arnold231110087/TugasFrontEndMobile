@@ -155,7 +155,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                               onTap: () async {
                                 final bool? payed = await Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const BankPage()),
+                                  MaterialPageRoute(builder: (_) => BankPage(amount: chat['amount'])),
                                 );
 
                                 if (payed == true) {

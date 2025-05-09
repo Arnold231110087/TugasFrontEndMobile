@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-// import 'payment_detail_page.dart';
+import 'payment_page.dart';
+import '../components/bank_option_component.dart';
 
 class BankPage extends StatefulWidget {
-  const BankPage({super.key});
+  final int amount;
+
+  const BankPage({
+    super.key,
+    required this.amount,
+  });
 
   @override
   State<BankPage> createState() => _BankPageState();
@@ -61,12 +67,16 @@ class _BankPageState extends State<BankPage> {
                 vertical: 24,
               ),
               itemCount: payments.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 24),
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final Map<String, dynamic> method = payments[index];
                 final isSelected = selectedPayment == method['name'];
 
-                return GestureDetector(
+                return BankOption(
+                  isSelected: isSelected,
+                  icon: method['icon'],
+                  name: method['name'],
+                  description: method['description'],
                   onTap: () {
                     setState(() {
                       if (isSelected) {
@@ -76,50 +86,6 @@ class _BankPageState extends State<BankPage> {
                       }
                     });
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected ? theme.textTheme.headlineSmall!.color! : theme.dividerColor,
-                        width: 2,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          method['icon'],
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                method['name'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: theme.textTheme.bodyLarge!.fontSize,
-                                  color: theme.textTheme.bodyLarge!.color,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                method['description']!,
-                                style: theme.textTheme.labelSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                          color: isSelected ? theme.textTheme.headlineSmall!.color : theme.textTheme.labelSmall!.color,
-                        ),
-                      ],
-                    ),
-                  ),
                 );
               },
             ),
@@ -130,10 +96,15 @@ class _BankPageState extends State<BankPage> {
               width: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (_) => PaymentDetailPage(category: selected['category']!)),
-                  // );
+                  final Map<String, dynamic> selected = payments.firstWhere((e) => e['name'] == selectedPayment);
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PaymentPage(
+                      amount: widget.amount,
+                      options: selected['options'],
+                    )),
+                  );
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: theme.textTheme.headlineSmall!.color,
