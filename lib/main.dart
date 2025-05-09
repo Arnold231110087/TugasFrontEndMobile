@@ -37,13 +37,19 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFF1E40AF),
           foregroundColor: Color(0xFFFFFFFF),
         ),
+        popupMenuTheme: PopupMenuThemeData(
+          color: Color(0xFFFFFFFF),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: Color(0xFFFFFFFF),
+        ),
         textTheme: TextTheme(
           displayLarge: TextStyle(color: Color(0xFFFFFFFF), fontSize: 18),
           displayMedium: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),
           displaySmall: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
-          headlineLarge: TextStyle(color: Color(0xFF2563EB), fontSize: 18),
-          headlineMedium: TextStyle(color: Color(0xFF2563EB), fontSize: 14),
-          headlineSmall: TextStyle(color: Color(0xFF2563EB), fontSize: 12),
+          headlineLarge: TextStyle(color: Color(0xFF1E4FCC), fontSize: 18),
+          headlineMedium: TextStyle(color: Color(0xFF1E4FCC), fontSize: 14),
+          headlineSmall: TextStyle(color: Color(0xFF1E4FCC), fontSize: 12),
           bodyLarge: TextStyle(color: Color(0xFF1A1A1A), fontSize: 18),
           bodyMedium: TextStyle(color: Color(0xFF1A1A1A), fontSize: 14),
           bodySmall: TextStyle(color: Color(0xFF1A1A1A), fontSize: 12),
@@ -60,6 +66,12 @@ class MyApp extends StatelessWidget {
           elevation: 0,
           backgroundColor: Color(0xFF121212),
           foregroundColor: Color(0xFFE0E0E0),
+        ),
+        popupMenuTheme: PopupMenuThemeData(
+          color: Color(0xFF121212),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: Color(0xFF121212),
         ),
         textTheme: TextTheme(
           displayLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
