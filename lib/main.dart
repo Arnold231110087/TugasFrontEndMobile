@@ -1,71 +1,121 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'mode_settings_page.dart';
-import 'theme_notifier.dart';
-import 'login_page.dart';
-import 'register_page.dart';
-import 'forgot_password_page.dart';
-import 'home_page.dart';
-import 'search_page.dart';
-import 'upload_page.dart';
-import 'notification_page.dart';
-import 'account_page.dart';
-import 'chat_page.dart';
+import 'providers/theme_provider.dart';
+import 'pages/auth/login_page.dart';
+import 'pages/auth/register_page.dart';
+import 'pages/auth/forgot_password_page.dart';
+import 'pages/home_page.dart';
+import 'pages/search_page.dart';
+import 'pages/upload_page.dart';
+import 'pages/notification_page.dart';
+import 'pages/account_page.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (_) => ThemeNotifier(),
+      create: (_) => ThemeProvider(),
       child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key
-  });
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of <ThemeNotifier> (context);
+    final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       title: 'LogoDesain',
       debugShowCheckedModeBanner: false,
-      theme: themeNotifier.currentTheme,
-      initialRoute: '/',
+      theme: ThemeData.light().copyWith(
+        scaffoldBackgroundColor: Color(0xFFFFFFFF),
+        cardColor: Color(0xFFF9FAFB),
+        dividerColor: Color(0xFFD1E7FF),
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          backgroundColor: Color(0xFF1E40AF),
+          foregroundColor: Color(0xFFFFFFFF),
+        ),
+        popupMenuTheme: PopupMenuThemeData(
+          color: Color(0xFFFFFFFF),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: Color(0xFFFFFFFF),
+        ),
+        textTheme: TextTheme(
+          displayLarge: TextStyle(color: Color(0xFFFFFFFF), fontSize: 18),
+          displayMedium: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),
+          displaySmall: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
+          headlineLarge: TextStyle(color: Color(0xFF1E4FCC), fontSize: 18),
+          headlineMedium: TextStyle(color: Color(0xFF1E4FCC), fontSize: 14),
+          headlineSmall: TextStyle(color: Color(0xFF1E4FCC), fontSize: 12),
+          bodyLarge: TextStyle(color: Color(0xFF1A1A1A), fontSize: 18),
+          bodyMedium: TextStyle(color: Color(0xFF1A1A1A), fontSize: 14),
+          bodySmall: TextStyle(color: Color(0xFF1A1A1A), fontSize: 12),
+          labelLarge: TextStyle(color: Color(0xFF7A7A7A), fontSize: 18),
+          labelMedium: TextStyle(color: Color(0xFF7A7A7A), fontSize: 14),
+          labelSmall: TextStyle(color: Color(0xFF7A7A7A), fontSize: 12),
+        ),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Color(0xFF121212),
+        cardColor: Color(0xFF1A1A1A),
+        dividerColor: Color(0xFF2C2C2C),
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          backgroundColor: Color(0xFF121212),
+          foregroundColor: Color(0xFFE0E0E0),
+        ),
+        popupMenuTheme: PopupMenuThemeData(
+          color: Color(0xFF121212),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: Color(0xFF121212),
+        ),
+        textTheme: TextTheme(
+          displayLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
+          displayMedium: TextStyle(color: Color(0xFFE0E0E0), fontSize: 14),
+          displaySmall: TextStyle(color: Color(0xFFE0E0E0), fontSize: 12),
+          headlineLarge: TextStyle(color: Color(0xFF5A8CD1), fontSize: 18),
+          headlineMedium: TextStyle(color: Color(0xFF5A8CD1), fontSize: 14),
+          headlineSmall: TextStyle(color: Color(0xFF5A8CD1), fontSize: 12),
+          bodyLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
+          bodyMedium: TextStyle(color: Color(0xFFE0E0E0), fontSize: 14),
+          bodySmall: TextStyle(color: Color(0xFFE0E0E0), fontSize: 12),
+          labelLarge: TextStyle(color: Color(0xFF8A8A8A), fontSize: 18),
+          labelMedium: TextStyle(color: Color(0xFF8A8A8A), fontSize: 14),
+          labelSmall: TextStyle(color: Color(0xFF8A8A8A), fontSize: 12),
+        ),
+      ),
+      themeMode: themeProvider.themeMode,
+      initialRoute: '/login',
       routes: {
-        '/': (context) => LoginPage(),
+        '/': (context) => MainNavigation(),
         '/login': (context) => LoginPage(),
-        '/home': (context) => MainNavigation(),
         '/register': (context) => RegisterPage(),
         '/forgot-password': (context) => ForgotPasswordPage(),
-        '/mode-settings': (context) => ModeSettingsPage(), 
       },
     );
   }
 }
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({
-    super.key
-  });
+  const MainNavigation({super.key});
+
   @override
-  State < MainNavigation > createState() => _MainNavigationState();
+  State<MainNavigation> createState() => _MainNavigationState();
 }
 
-class _MainNavigationState extends State < MainNavigation > {
+class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
-  final List < Widget > _pages = [
+  final List<Widget> _pages = [
     HomePage(),
     SearchPage(),
     UploadPage(),
     NotificationPage(),
     AccountPage(),
-  ];
-
-  final _title = [
-    'LOGODESAIN', 'LOGODESAIN', "Unggahan Baru", "LOGODESAIN", 'LOGODESAIN'
   ];
 
   void _onItemTapped(int index) {
@@ -76,119 +126,41 @@ class _MainNavigationState extends State < MainNavigation > {
 
   @override
   Widget build(BuildContext context) {
-    final Color primaryColor = Color(0xFF1E3A8A);
+    final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-                color: Colors.white,
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-            );
-          },
-        ),
-        title: Text(
-          _title[_selectedIndex],
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 20,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-              child: _selectedIndex == 4 ? Text("VALERIO LIUZ KIENATA", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold), ) :
-              IconButton(
-                icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ChatPage()),
-                    );
-                  },
-              ),
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          children: [
-            const DrawerHeader(
-                decoration: BoxDecoration(color: Color(0xFF1E3A8A)),
-                child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 18)),
-              ),
-              const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text('Pengaturan aplikasi', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                ),
-                _buildDrawerTile(title: 'Bahasa', icon: const Icon(Icons.language)),
-                _buildDrawerTile(title: 'Tema', icon: const Icon(Icons.color_lens_outlined)),
-                _buildDrawerTile(
-                  title: 'Mode',
-                  icon: const Icon(Icons.wb_sunny_outlined),
-                    onTap: () {
-                      Navigator.pop(context); // tutup drawer
-                      Navigator.pushNamed(context, '/mode-settings');
-                    },
-                ),
-
-
-                const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text('Bantuan dan layanan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                  ),
-                  _buildDrawerTile(title: 'Status akun', icon: const Icon(Icons.account_circle_outlined)),
-                  _buildDrawerTile(title: 'Obrolan dukungan teknis', icon: const Icon(Icons.support_agent)),
-                  _buildDrawerTile(title: 'Hubungi kami', icon: const Icon(Icons.phone_in_talk_outlined)),
-                  _buildDrawerTile(title: 'Bantuan', icon: const Icon(Icons.help_outline)),
-
-                  const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text('Informasi lebih lanjut', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                    ),
-                    _buildDrawerTile(title: 'Ketentuan dan kebijakan', icon: const Icon(Icons.description_outlined)),
-                    _buildDrawerTile(title: 'Tentang kami', icon: const Icon(Icons.info_outline)),
-          ],
-        ),
-      ),
-
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.blue.shade900,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: theme.textTheme.headlineSmall!.color,
+        unselectedItemColor: theme.textTheme.labelSmall!.color,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Beranda"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Cari"),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: "Unggah"),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications_none), label: "Notifikasi"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Akun"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Beranda',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Cari',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_box_outlined),
+            label: 'Unggah',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_none),
+            label: 'Notifikasi',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Akun',
+          ),
         ],
       ),
-    );
-  }
-  Widget _buildDrawerTile({
-    required String title,
-    required Icon icon,
-    VoidCallback ? onTap
-  }) {
-    return ListTile(
-      title: Text(title),
-      leading: icon,
-      onTap: onTap ?? () {},
     );
   }
 }
