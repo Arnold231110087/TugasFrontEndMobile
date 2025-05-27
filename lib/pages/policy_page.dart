@@ -37,10 +37,10 @@ class PolicyPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Ketentuan dan Kebijakan'),
-        backgroundColor: theme.colorScheme.background,
+        backgroundColor: theme.scaffoldBackgroundColor,
         foregroundColor: theme.textTheme.bodyLarge?.color,
         elevation: 0,
       ),
