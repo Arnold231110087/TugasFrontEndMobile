@@ -242,6 +242,8 @@ class _AccountPageState extends State<AccountPage> {
                 }),
               ],
             ),
+            Divider(),
+
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16,

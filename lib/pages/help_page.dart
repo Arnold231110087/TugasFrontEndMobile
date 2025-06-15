@@ -13,16 +13,12 @@ class _HelpPageState extends State<HelpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pusat Bantuan'),
-        backgroundColor: theme.colorScheme.background,
-        foregroundColor: theme.textTheme.bodyLarge?.color,
         elevation: 0,
       ),
-      backgroundColor: theme.colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

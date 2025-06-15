@@ -7,15 +7,11 @@ class AccountStatusPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Status Akun"),
-        backgroundColor: theme.colorScheme.background,
-        foregroundColor: theme.textTheme.bodyLarge?.color,
       ),
-      backgroundColor: theme.colorScheme.background,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -84,11 +84,8 @@ class _PostDetailPageState extends State < PostDetailPage> {
     final theme=Theme.of(context);
 
     return Scaffold(appBar: AppBar(title: const Text("Detail Post"),
-        backgroundColor: theme.colorScheme.background,
-        foregroundColor: theme.textTheme.bodyLarge?.color,
         elevation : 0,
       ),
-      backgroundColor: theme.colorScheme.background,
       body: SingleChildScrollView(padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start,
           children: [ // Profile

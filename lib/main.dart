@@ -146,22 +146,27 @@ class _MainNavigationState extends State<MainNavigation> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Beranda',
+            tooltip: 'Beranda',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Cari',
+            tooltip: 'Cari',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_box_outlined),
             label: 'Unggah',
+            tooltip: 'Unggah',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications_none),
             label: 'Notifikasi',
+            tooltip: 'Notifikasi',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Akun',
+            tooltip: 'Akun',
           ),
         ],
       ),

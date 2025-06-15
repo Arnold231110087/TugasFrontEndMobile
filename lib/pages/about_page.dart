@@ -6,14 +6,10 @@ class AboutUsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
         title: const Text('Tentang Kami'),
-        backgroundColor: theme.colorScheme.background,
-        foregroundColor: theme.colorScheme.onBackground,
         elevation: 0,
       ),
       body: ListView(

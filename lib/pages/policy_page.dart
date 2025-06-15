@@ -40,8 +40,6 @@ class PolicyPage extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Ketentuan dan Kebijakan'),
-        backgroundColor: theme.scaffoldBackgroundColor,
-        foregroundColor: theme.textTheme.bodyLarge?.color,
         elevation: 0,
       ),
       body: ListView.separated(
