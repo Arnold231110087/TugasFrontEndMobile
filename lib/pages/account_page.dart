@@ -4,7 +4,9 @@ import '../providers/theme_provider.dart';
 import 'edit_profile_page.dart';
 import 'change_password_page.dart';
 import 'about_page.dart';
+import 'account_status_page.dart';
 import 'policy_page.dart';
+import 'help_page.dart';
 import 'post_page.dart';
 import 'sales_page.dart';
 import '../components/drawer_section_component.dart';
@@ -40,10 +42,10 @@ class _AccountPageState extends State<AccountPage> {
     {
       'section': 'Bantuan dan layanan',
       'tiles': [
-        {'title': 'Status akun', 'icon': Icons.account_circle_outlined},
+        {'title': 'Status akun', 'icon': Icons.account_circle_outlined, 'page': AccountStatusPage()},
         {'title': 'Obrolan dukungan teknis', 'icon': Icons.support_agent},
         {'title': 'Hubungi kami', 'icon': Icons.phone_in_talk_outlined},
-        {'title': 'Bantuan', 'icon': Icons.help_outline},
+        {'title': 'Bantuan', 'icon': Icons.help_outline, 'page': HelpPage()},
       ],
     },
     {

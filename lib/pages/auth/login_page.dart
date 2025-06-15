@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../components/input_field_2_component.dart';
 
 class LoginPage extends StatelessWidget {
@@ -9,149 +10,170 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return WillPopScope(
+      onWillPop: () async => false, // mencegah tombol back ke onboarding
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Logo - Start
-                Container(
-                  margin: const EdgeInsets.only(bottom: 24),
-                  child: CircleAvatar(
-                    radius: 48,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.ac_unit,
-                      size: 48,
-                      color: Colors.blue,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Logo
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
                     ),
-                    // Ganti dengan logo asli jika ada
-                  ),
-                ),
-                Text(
-                  'Selamat datang di',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                Text(
-                  'LOGODESAIN',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                // Logo - End
-                const SizedBox(height: 32),
-                // Email input
-                InputField2(
-                  icon: Icons.email,
-                  hint: 'Email',
-                  controller: emailController,
-                ),
-                // Password input
-                InputField2(
-                  icon: Icons.lock,
-                  hint: 'Kata sandi',
-                  controller: passwordController,
-                  obscureText: true,
-                ),
-                const SizedBox(height: 12),
-                // Tombol Login
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(8),
+                    child: CircleAvatar(
+                      radius: 48,
                       backgroundColor: Colors.white,
-                      foregroundColor: Colors.blue.shade900,
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: ClipOval(
+                        child: Image.asset(
+                          "images/logo.jpg",
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Selamat datang di',
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  const Text(
+                    'LOGODESAIN',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Email
+                  InputField2(
+                    icon: Icons.email,
+                    hint: 'Email',
+                    controller: emailController,
+                  ),
+
+                  // Password
+                  InputField2(
+                    icon: Icons.lock,
+                    hint: 'Kata sandi',
+                    controller: passwordController,
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Tombol Login
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.blue.shade900,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final email = emailController.text.trim();
+                        final password = passwordController.text.trim();
+                        final emailRegex =
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+
+                        if (email.isEmpty || password.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Email dan password tidak boleh kosong',
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (!RegExp(emailRegex).hasMatch(email)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Email tidak valid',
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Simpan status login
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('is_logged_in', true);
+
+                        // Navigasi ke home page
+                        Navigator.pushReplacementNamed(context, '/');
+                      },
+                      child: const Text('Masuk'),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Lupa kata sandi
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/forgot-password');
+                      },
+                      child: const Text(
+                        'Lupa sandi',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Belum punya akun?
+                  const Text(
+                    'Belum memiliki akun',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 32,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {
-                      final String email = emailController.text.trim();
-                      final String password = passwordController.text.trim();
-
-                      final String emailRegex = r'^(?!.*\.\.)(?!^\.)(?!.*\.$)(?!.*-$)(?!.*\.-)([a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)$';
-
-                      if (email.isEmpty || password.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Email dan password tidak boleh kosong',
-                              style: theme.textTheme.displayMedium,
-                            ),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-
-                      if (!RegExp(emailRegex).hasMatch(email)) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Email tidak valid',
-                              style: theme.textTheme.displayMedium,
-                            ),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-
-                      Navigator.pushReplacementNamed(context, '/');
+                      Navigator.pushNamed(context, '/register');
                     },
-                    child: Text('Masuk'),
+                    child: const Text('Daftar'),
                   ),
-                ),
-                const SizedBox(height: 8),
-                // Lupa Sandi
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/forgot-password');
-                    },
-                    child: Text(
-                      'Lupa sandi',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Belum punya akun - Start
-                Text(
-                  'Belum memiliki akun',
-                  style: TextStyle(color: Colors.white),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: BorderSide(color: Colors.white),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 32,
-                    ),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/register');
-                  },
-                  child: Text('Daftar'),
-                ),
-                // Belum punya akun - End
-              ],
+                ],
+              ),
             ),
           ),
         ),

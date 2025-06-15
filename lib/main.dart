@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
+import 'screens/splash_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'pages/auth/login_page.dart';
 import 'pages/auth/register_page.dart';
 import 'pages/auth/forgot_password_page.dart';
@@ -89,9 +91,11 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: themeProvider.themeMode,
-      initialRoute: '/login',
+      initialRoute: '/splash',
       routes: {
         '/': (context) => MainNavigation(),
+        '/splash': (context) => const SplashScreen(),
+        '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
         '/forgot-password': (context) => ForgotPasswordPage(),
