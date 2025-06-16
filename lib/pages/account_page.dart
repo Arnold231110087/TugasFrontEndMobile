@@ -4,6 +4,7 @@ import '../providers/theme_provider.dart';
 import 'edit_profile_page.dart';
 import 'change_password_page.dart';
 import 'about_page.dart';
+import 'history_page.dart';
 import 'account_status_page.dart';
 import 'policy_page.dart';
 import 'help_page.dart';
@@ -30,6 +31,7 @@ class _AccountPageState extends State<AccountPage> {
         {'title': 'Ubah kata sandi', 'icon': Icons.lock, 'page': ChangePasswordPage()},
         {'title': 'Privasi', 'icon': Icons.privacy_tip},
         {'title': 'Notifikasi', 'icon': Icons.notifications},
+        {'title': 'Histori', 'icon': Icons.history,'page':HistoryPage()},
       ],
     },
     {

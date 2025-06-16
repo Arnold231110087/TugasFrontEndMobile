@@ -206,11 +206,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   Expanded(
                     child: TextField(
                       style: theme.textTheme.bodyMedium,
+                      
                       cursorColor: theme.textTheme.headlineSmall!.color,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: theme.scaffoldBackgroundColor,
                         hintText: 'Ketik obrolan',
+                        suffix: IconButton(icon: Icon(Icons.send),onPressed: () {},),
                         hintStyle: theme.textTheme.labelMedium,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
