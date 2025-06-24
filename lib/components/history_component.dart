@@ -2,24 +2,11 @@ import 'package:flutter/material.dart';
 import '../utils/rupiah_format.dart';
 
 class HistoryComponent extends StatelessWidget {
-  final String title;
-  final String description;
-
-  final String profile;
-  final int price;
-  final String date;
-  final String time;
-  final bool success;
+  final Map item;
 
   const HistoryComponent({
     super.key,
-    required this.title,
-    required this.description,
-    required this.profile,
-    required this.date,
-    required this.time,
-    required this.price,
-    required this.success,
+    required this.item,
   });
 
   @override
@@ -35,17 +22,17 @@ class HistoryComponent extends StatelessWidget {
             padding: const EdgeInsets.only(right: 20.0),
             child: CircleAvatar(
               child: Icon(
-                success ? Icons.check : Icons.close,
+                item['success'] ? Icons.check : Icons.close,
                 size: 30,
-                color: success ? Colors.green : Colors.red,
+                color: item['success'] ? Colors.green : Colors.red,
               ),
             ),
           ),
-          title: Text(title),
-          subtitle: Text('$description\n$date $time'),
+          title: Text(item['title']),
+          subtitle: Text('${item['description']}\n${item['date']} ${item['time']}'),
           isThreeLine: true,
           onTap: (){},
-          trailing: Text(rupiahFormat(price), style: theme.textTheme.bodyLarge),
+          trailing: Text(rupiahFormat(item['price']), style: theme.textTheme.bodyLarge),
         ),
         Divider(),
       ],

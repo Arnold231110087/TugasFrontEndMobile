@@ -15,13 +15,15 @@ class HistoryPage extends StatelessWidget {
         'profile' : 'images/profile1.png',
         'price' : 32000,
         'success': true,
+        "id_transaksi": "202505141129",
         'date' : '14 Mei 2025',
         'time' : '12:01',
        },
       {
         'title': 'Kujo Jotaro',
-        'description': 'Pembelian Logo pertamina {Dibatalkan}',
+        'description': 'Pembelian Logo pertamina',
         'success': false,
+        "id_transaksi": "202506120972",
         'profile' : 'images/profile1.png',
         'price' : 82500,
         'date' : '12 Juni 2025',
@@ -48,13 +50,7 @@ class HistoryPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = history[index];
           return HistoryComponent(
-            title: item['title'],
-            description: item['description'],
-            profile: item['profile'],
-            success: item['success'],
-            price: item['price'],
-            date: item['date'],
-            time: item['time'],
+            item: item
           );
         },
       ),
