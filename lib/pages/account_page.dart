@@ -27,11 +27,18 @@ class _AccountPageState extends State<AccountPage> {
     {
       'section': 'Akun',
       'tiles': [
-        {'title': 'Ubah profil', 'icon': Icons.person, 'page': EditProfilePage()},
-        {'title': 'Ubah kata sandi', 'icon': Icons.lock, 'page': ChangePasswordPage()},
+        {
+          'title': 'Ubah profil',
+          'icon': Icons.person,
+          'page': EditProfilePage(),
+        },
+        {
+          'title': 'Ubah kata sandi',
+          'icon': Icons.lock,
+          'page': ChangePasswordPage(),
+        },
         {'title': 'Privasi', 'icon': Icons.privacy_tip},
-        {'title': 'Notifikasi', 'icon': Icons.notifications},
-        {'title': 'Histori', 'icon': Icons.history,'page':HistoryPage()},
+        {'title': 'Histori', 'icon': Icons.history, 'page': HistoryPage()},
       ],
     },
     {
@@ -44,7 +51,11 @@ class _AccountPageState extends State<AccountPage> {
     {
       'section': 'Bantuan dan layanan',
       'tiles': [
-        {'title': 'Status akun', 'icon': Icons.account_circle_outlined, 'page': AccountStatusPage()},
+        {
+          'title': 'Status akun',
+          'icon': Icons.account_circle_outlined,
+          'page': AccountStatusPage(),
+        },
         {'title': 'Obrolan dukungan teknis', 'icon': Icons.support_agent},
         {'title': 'Hubungi kami', 'icon': Icons.phone_in_talk_outlined},
         {'title': 'Bantuan', 'icon': Icons.help_outline, 'page': HelpPage()},
@@ -53,8 +64,16 @@ class _AccountPageState extends State<AccountPage> {
     {
       'section': 'Informasi lebih lanjut',
       'tiles': [
-        {'title': 'Ketentuan dan kebijakan', 'icon': Icons.description_outlined, 'page': PolicyPage()},
-        {'title': 'Tentang kami', 'icon': Icons.info_outline, 'page': AboutUsPage()},
+        {
+          'title': 'Ketentuan dan kebijakan',
+          'icon': Icons.description_outlined,
+          'page': PolicyPage(),
+        },
+        {
+          'title': 'Tentang kami',
+          'icon': Icons.info_outline,
+          'page': AboutUsPage(),
+        },
       ],
     },
   ];
@@ -106,22 +125,18 @@ class _AccountPageState extends State<AccountPage> {
       ),
       endDrawer: Drawer(
         backgroundColor: theme.scaffoldBackgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.zero)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.zero),
+        ),
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.dark_mode,
-                  color: theme.textTheme.bodySmall!.color,
-                ),
+                Icon(Icons.dark_mode, color: theme.textTheme.bodySmall!.color),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Mode gelap',
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  child: Text('Mode gelap', style: theme.textTheme.bodyMedium),
                 ),
                 Switch(
                   inactiveTrackColor: theme.scaffoldBackgroundColor,
@@ -135,19 +150,32 @@ class _AccountPageState extends State<AccountPage> {
               ],
             ),
             SizedBox(height: 24),
-            ...drawers.expand<Widget>((drawer) => [
-              DrawerSection(
-                section: drawer['section'],
-                tiles: drawer['tiles'],
-              ),
-              const SizedBox(height: 16),
-            ]).toList()..removeLast(),
+            ...drawers
+                .expand<Widget>(
+                  (drawer) => [
+                    DrawerSection(
+                      section: drawer['section'],
+                      tiles: drawer['tiles'],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                )
+                .toList()
+              ..removeLast(),
             SizedBox(height: 40),
             TextButton.icon(
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(themeProvider.isDarkMode ? Color(0xFFE11D48) : Color(0xFFDC2626)),
-                foregroundColor: WidgetStateProperty.all(theme.textTheme.displayMedium!.color),
-                textStyle: WidgetStateProperty.all(theme.textTheme.displayMedium),
+                backgroundColor: WidgetStateProperty.all(
+                  themeProvider.isDarkMode
+                      ? Color(0xFFE11D48)
+                      : Color(0xFFDC2626),
+                ),
+                foregroundColor: WidgetStateProperty.all(
+                  theme.textTheme.displayMedium!.color,
+                ),
+                textStyle: WidgetStateProperty.all(
+                  theme.textTheme.displayMedium,
+                ),
               ),
               label: Text('Keluar'),
               icon: Icon(Icons.logout),
@@ -162,10 +190,7 @@ class _AccountPageState extends State<AccountPage> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 24,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -192,25 +217,38 @@ class _AccountPageState extends State<AccountPage> {
                             SizedBox(height: 12),
                             Row(
                               children: [
-                                ...stats.entries.expand<Widget>((entry) => [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        entry.value.toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: theme.textTheme.bodyMedium!.fontSize,
-                                          color: theme.textTheme.bodyMedium!.color,
+                                ...stats.entries
+                                    .expand<Widget>(
+                                      (entry) => [
+                                        Column(
+                                          children: [
+                                            Text(
+                                              entry.value.toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize:
+                                                    theme
+                                                        .textTheme
+                                                        .bodyMedium!
+                                                        .fontSize,
+                                                color:
+                                                    theme
+                                                        .textTheme
+                                                        .bodyMedium!
+                                                        .color,
+                                              ),
+                                            ),
+                                            Text(
+                                              entry.key,
+                                              style: theme.textTheme.labelSmall,
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      Text(
-                                        entry.key,
-                                        style: theme.textTheme.labelSmall,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 32),
-                                ]).toList()..removeLast(),
+                                        const SizedBox(width: 32),
+                                      ],
+                                    )
+                                    .toList()
+                                  ..removeLast(),
                               ],
                             ),
                           ],
@@ -239,7 +277,7 @@ class _AccountPageState extends State<AccountPage> {
                       setState(() {
                         selectedTab = index;
                       });
-                    }
+                    },
                   );
                 }),
               ],
@@ -247,10 +285,7 @@ class _AccountPageState extends State<AccountPage> {
             Divider(),
 
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 24,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: sections[selectedTab]['page'],
             ),
           ],

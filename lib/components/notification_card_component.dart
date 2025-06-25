@@ -6,6 +6,7 @@ class NotificationCard extends StatelessWidget {
   final String time;
   final String? comment;
   final String imageAsset;
+  final IconData? icon;
 
   const NotificationCard({
     super.key,
@@ -14,60 +15,91 @@ class NotificationCard extends StatelessWidget {
     required this.time,
     this.comment,
     required this.imageAsset,
+    this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        crossAxisAlignment: comment != null ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-        children: [
-          CircleAvatar(backgroundImage: AssetImage(imageAsset)),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 0,
+      color: theme.cardColor,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          style: theme.textTheme.bodyMedium,
-                          children: [
-                            TextSpan(
-                              text: name,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(text: ' $message'),
-                          ],
+                CircleAvatar(
+                  radius: 24,
+                  backgroundImage: AssetImage(imageAsset),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: theme.textTheme.titleLarge!.color,
                         ),
                       ),
-                    ),
-                    SizedBox(width: 16),
-                    Text(
-                      time,
-                      style: theme.textTheme.labelSmall,
-                    ),
-                  ],
-                ),
-                if (comment != null) ...[
-                  SizedBox(height: 8),
-                  Text(
-                    comment!,
-                    style: theme.textTheme.labelMedium,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                      const SizedBox(height: 4),
+                      Text(
+                        message,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.textTheme.bodyMedium!.color,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(
+                            time,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.textTheme.bodySmall!.color,
+                            ),
+                          ),
+                          if (icon != null)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 6.0),
+                              child: Icon(
+                                icon,
+                                size: 14,
+                                color: theme.primaryColor,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ],
             ),
-          ),
-        ],
+            if (comment != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Text(
+                  'Komentar: "$comment"',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 13,
+                    color: theme.textTheme.bodySmall!.color,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
