@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/search_account_component.dart';
 
 class SearchPage extends StatefulWidget {
-  SearchPage({super.key});
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -14,7 +14,7 @@ class _SearchPageState extends State<SearchPage> {
   bool _isSearching = false;
   bool _noResultsFound = false;
 
-  final List<Map<String, dynamic>> searchedAccounts = [
+  final List<Map<String, dynamic>> _searchedAccounts = [
     {'name': 'Jessica Bui', 'followers': '193 pengikut', 'rating': 4.8},
     {
       'name': 'Richardo Lieberio',
@@ -38,7 +38,7 @@ class _SearchPageState extends State<SearchPage> {
   ];
 
   List<Map<String, dynamic>> get _allAccounts => [
-    ...searchedAccounts,
+    ..._searchedAccounts,
     ...randomAccounts,
   ];
 
@@ -64,14 +64,26 @@ class _SearchPageState extends State<SearchPage> {
         _noResultsFound = false;
       } else {
         _isSearching = true;
-        _filteredAccounts =
-            _allAccounts
-                .where(
-                  (account) => account['name'].toLowerCase().contains(query),
-                )
-                .toList();
+        _filteredAccounts = _allAccounts
+            .where(
+              (account) => account['name'].toLowerCase().contains(query),
+            )
+            .toList();
         _noResultsFound = _filteredAccounts.isEmpty;
       }
+    });
+  }
+
+  void _deleteSearchedAccount(int index) {
+    setState(() {
+      final String deletedName = _searchedAccounts[index]['name'];
+      _searchedAccounts.removeAt(index);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Akun "$deletedName" dihapus dari riwayat pencarian.'),
+          backgroundColor: Colors.grey.shade700,
+        ),
+      );
     });
   }
 
@@ -85,7 +97,7 @@ class _SearchPageState extends State<SearchPage> {
         automaticallyImplyLeading: false,
         title: Container(
           height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: theme.cardColor,
             borderRadius: BorderRadius.circular(20),
@@ -105,119 +117,127 @@ class _SearchPageState extends State<SearchPage> {
               hintText: 'Cari',
               hintStyle: theme.textTheme.labelMedium,
               border: InputBorder.none,
-              suffixIcon:
-                  _searchController.text.isNotEmpty
-                      ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: theme.textTheme.bodySmall!.color,
-                        ),
-                        onPressed: () {
-                          _searchController.clear();
-                        },
-                      )
-                      : null,
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.clear,
+                        color: theme.textTheme.bodySmall!.color,
+                      ),
+                      onPressed: () {
+                        _searchController.clear();
+                      },
+                    )
+                  : null,
             ),
           ),
         ),
       ),
       body: SafeArea(
-        child:
-            _isSearching
-                ? _noResultsFound
-                    ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.person_off_outlined,
-                            size: 64,
+        child: _isSearching
+            ? _noResultsFound
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.person_off_outlined,
+                          size: 64,
+                          color: theme.textTheme.labelLarge!.color,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'User tidak ditemukan',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                             color: theme.textTheme.labelLarge!.color,
                           ),
-                          SizedBox(height: 16),
-                          Text(
-                            'User tidak ditemukan',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: theme.textTheme.labelLarge!.color,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Coba cari dengan nama lain atau periksa ejaan.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: theme.textTheme.bodySmall!.color,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    )
-                    : ListView(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 24,
-                        horizontal: 16,
-                      ),
-                      children:
-                          _filteredAccounts.map((account) {
-                            return SearchAccount(
-                              name: account['name'],
-                              followers: account['followers'],
-                              followsYou: account['followsYou'] ?? false,
-                              isFriend: account['isFriend'] ?? false,
-                              rating: account['rating'],
-                            );
-                          }).toList(),
-                    )
-                : ListView(
-                  padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Akun yang pernah dicari',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: theme.textTheme.bodyMedium!.fontSize,
-                            color: theme.textTheme.bodyMedium!.color,
-                          ),
                         ),
+                        const SizedBox(height: 8),
                         Text(
-                          'Lihat semua',
-                          style: theme.textTheme.headlineSmall,
+                          'Coba cari dengan nama lain atau periksa ejaan.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: theme.textTheme.bodySmall!.color,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
-                    SizedBox(height: 12),
-                    ...searchedAccounts.map((account) {
-                      return SearchAccount(
-                        name: account['name'],
-                        followers: account['followers'],
-                        followsYou: account['followsYou'] ?? false,
-                        isFriend: account['isFriend'] ?? false,
-                        rating: account['rating'],
-                      );
-                    }),
-                    SizedBox(height: 36),
-                    Text(
-                      'Akun acak',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 16,
                     ),
-                    SizedBox(height: 12),
-                    ...randomAccounts.map((account) {
+                    itemCount: _filteredAccounts.length,
+                    itemBuilder: (context, index) {
+                      final account = _filteredAccounts[index];
                       return SearchAccount(
+                        key: ValueKey(account['name']),
                         name: account['name'],
                         followers: account['followers'],
                         followsYou: account['followsYou'] ?? false,
                         isFriend: account['isFriend'] ?? false,
                         rating: account['rating'],
+                        // onDelete is intentionally NOT provided here for filtered results
                       );
-                    }),
-                  ],
-                ),
+                    },
+                  )
+            : ListView(
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Akun yang pernah dicari',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: theme.textTheme.bodyMedium!.fontSize,
+                          color: theme.textTheme.bodyMedium!.color,
+                        ),
+                      ),
+                      Text(
+                        'Lihat semua',
+                        style: theme.textTheme.headlineSmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ...List.generate(_searchedAccounts.length, (index) {
+                    final account = _searchedAccounts[index];
+                    return SearchAccount(
+                      key: ValueKey(account['name']),
+                      name: account['name'],
+                      followers: account['followers'],
+                      followsYou: account['followsYou'] ?? false,
+                      isFriend: account['isFriend'] ?? false,
+                      rating: account['rating'],
+                      // Provide onDelete for searched accounts
+                      onDelete: () => _deleteSearchedAccount(index),
+                    );
+                  }),
+                  const SizedBox(height: 36),
+                  Text(
+                    'Akun acak',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  // For random accounts, do NOT provide the onDelete callback
+                  ...randomAccounts.map((account) {
+                    return SearchAccount(
+                      key: ValueKey(account['name']),
+                      name: account['name'],
+                      followers: account['followers'],
+                      followsYou: account['followsYou'] ?? false,
+                      isFriend: account['isFriend'] ?? false,
+                      rating: account['rating'],
+                      // onDelete is intentionally NOT provided here
+                    );
+                  }),
+                ],
+              ),
       ),
     );
   }
