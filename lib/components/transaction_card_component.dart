@@ -5,6 +5,7 @@ class TransactionCard extends StatelessWidget {
   final String message;
   final double rating;
   final String imageAsset;
+  final VoidCallback? onProfileTap;
 
   const TransactionCard({
     super.key,
@@ -12,6 +13,7 @@ class TransactionCard extends StatelessWidget {
     required this.message,
     required this.rating,
     required this.imageAsset,
+    this.onProfileTap,
   });
 
   @override
@@ -28,44 +30,55 @@ class TransactionCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            backgroundImage: AssetImage(imageAsset),
-            radius: 24,
-          ),
-          SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: theme.textTheme.bodyMedium,
-                  children: [
-                    TextSpan(
-                      text: name,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    TextSpan(text: ' $message'),
-                  ],
-                ),
-              ),
-              SizedBox(height: 8),
-              Row(
+          MouseRegion(
+            cursor:
+                SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: onProfileTap,
+              child: Row(
                 children: [
-                  ...List.generate(rating.ceil(), (index) {
-                    return Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                      size: 14,
-                    );
-                  }),
-                  SizedBox(width: 6),
-                  Text(
-                    rating.toString(),
-                    style: theme.textTheme.bodySmall,
+                  CircleAvatar(
+                    backgroundImage: AssetImage(imageAsset),
+                    radius: 24,
+                  ),
+                  SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          style: theme.textTheme.bodyMedium,
+                          children: [
+                            TextSpan(
+                              text: name,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: ' $message'),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          ...List.generate(rating.ceil(), (index) {
+                            return Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 14,
+                            );
+                          }),
+                          SizedBox(width: 6),
+                          Text(
+                            rating.toString(),
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ],
       ),

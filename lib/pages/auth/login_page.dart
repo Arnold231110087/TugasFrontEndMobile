@@ -28,7 +28,6 @@ class LoginPage extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Logo
                   Container(
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: const BoxDecoration(
@@ -62,14 +61,12 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
 
-                  // Email
                   InputField2(
                     icon: Icons.email,
                     hint: 'Email',
                     controller: emailController,
                   ),
 
-                  // Password
                   InputField2(
                     icon: Icons.lock,
                     hint: 'Kata sandi',
@@ -78,7 +75,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Tombol Login
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -100,13 +96,30 @@ class LoginPage extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Email dan password tidak boleh kosong',
-                                style: theme.textTheme.bodyMedium,
+                                'Email dan kata sandi tidak boleh kosong',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                ),
                               ),
                               backgroundColor: Colors.red,
                             ),
                           );
                           return;
+                        }
+
+                        if (password.length < 6) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Kata sandi minimal 6 karakter',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                ), 
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return; 
                         }
 
                         if (!RegExp(emailRegex).hasMatch(email)) {
@@ -114,7 +127,9 @@ class LoginPage extends StatelessWidget {
                             SnackBar(
                               content: Text(
                                 'Email tidak valid',
-                                style: theme.textTheme.bodyMedium,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                ), 
                               ),
                               backgroundColor: Colors.red,
                             ),
@@ -122,11 +137,9 @@ class LoginPage extends StatelessWidget {
                           return;
                         }
 
-                        // Simpan status login
                         final prefs = await SharedPreferences.getInstance();
                         await prefs.setBool('is_logged_in', true);
 
-                        // Navigasi ke home page
                         Navigator.pushReplacementNamed(context, '/');
                       },
                       child: const Text('Masuk'),
@@ -134,7 +147,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Lupa kata sandi
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton(
@@ -149,7 +161,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // Belum punya akun?
                   const Text(
                     'Belum memiliki akun',
                     style: TextStyle(color: Colors.white),

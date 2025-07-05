@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'chat_page.dart';
-import 'post_follow_page.dart';
+import 'post_follow_page.dart'; 
 import '../components/best_designer_card_component.dart';
 import '../components/post_card_component.dart';
 import '../components/transaction_card_component.dart';
+import 'designer_account_page.dart'; 
 
 class HomePage extends StatelessWidget {
-  const HomePage({
-    super.key
-  });
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,27 +28,24 @@ class HomePage extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 4),
-              child: IconButton(
-                icon: Icon(
-                  Icons.chat_bubble_outline,
-                  color: theme.textTheme.displaySmall!.color
-                ),
+            child: IconButton(
+              icon: Icon(
+                Icons.chat_bubble_outline,
                 color: theme.textTheme.displaySmall!.color,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ChatPage()),
-                  );
-                },
               ),
+              color: theme.textTheme.displaySmall!.color,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatPage()),
+                );
+              },
+            ),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 24,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -78,6 +74,21 @@ class HomePage extends StatelessWidget {
                     rating: 5.0,
                     followers: '198 Pengikut',
                     imageAsset: 'images/profile1.png',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => DesignerAccountPage(
+                                designerName: 'Richardo Lieberio',
+                                imageAsset: 'images/profile1.png',
+                                sales: '17 Penjualan',
+                                rating: 5.0,
+                                followers: '198 Pengikut',
+                              ),
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(width: 20),
                   BestDesignerCard(
@@ -86,6 +97,21 @@ class HomePage extends StatelessWidget {
                     rating: 4.8,
                     followers: '193 Pengikut',
                     imageAsset: 'images/profile2.png',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => DesignerAccountPage(
+                                designerName: 'Jessica Bui',
+                                imageAsset: 'images/profile2.png',
+                                sales: '10 Penjualan',
+                                rating: 4.8,
+                                followers: '193 Pengikut',
+                              ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -117,6 +143,21 @@ class HomePage extends StatelessWidget {
               message: 'telah menyelesaikan sebuah transaksi',
               rating: 5.0,
               imageAsset: 'images/profile3.png',
+              onProfileTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => DesignerAccountPage(
+                          designerName: 'Kevin Durant',
+                          imageAsset: 'images/profile3.png',
+                          sales: '15 Penjualan', 
+                          rating: 5.0,
+                          followers: '150 Pengikut', 
+                        ),
+                  ),
+                );
+              },
             ),
             SizedBox(height: 16),
             TransactionCard(
@@ -124,6 +165,21 @@ class HomePage extends StatelessWidget {
               message: 'telah menyelesaikan sebuah transaksi',
               rating: 4.0,
               imageAsset: 'images/profile4.png',
+              onProfileTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => DesignerAccountPage(
+                          designerName: 'Ahmad',
+                          imageAsset: 'images/profile4.png',
+                          sales: '8 Penjualan', 
+                          rating: 4.0,
+                          followers: '90 Pengikut', 
+                        ),
+                  ),
+                );
+              },
             ),
             SizedBox(height: 60),
             Text(
@@ -138,7 +194,8 @@ class HomePage extends StatelessWidget {
             PostCard(
               username: 'Rendy',
               time: '3 jam lalu',
-              message: 'Beberapa logo yang pernah aku kerjakan untuk giant companies yang ada di Indonesia',
+              message:
+                  'Beberapa logo yang pernah aku kerjakan untuk giant companies yang ada di Indonesia',
               logos: [
                 'images/bca.png',
                 'images/garuda.png',
@@ -152,26 +209,26 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                    const PostDetailPage(
-                      username: 'Rendy',
-                      time: '3 jam lalu',
-                      message: 'Beberapa logo yang pernah aku kerjakan untuk giant companies yang ada di Indonesia',
-                      logos: [
-                        'images/bca.png',
-                        'images/garuda.png',
-                        'images/gojek.png',
-                        'images/pertamina.png',
-                      ],
-                      profileImage: 'images/profile5.png',
-                      like: 89,
-                      comment: 6,
-                    ),
+                    builder:
+                        (context) => const PostDetailPage(
+                          username: 'Rendy',
+                          time: '3 jam lalu',
+                          message:
+                              'Beberapa logo yang pernah aku kerjakan untuk giant companies yang ada di Indonesia',
+                          logos: [
+                            'images/bca.png',
+                            'images/garuda.png',
+                            'images/gojek.png',
+                            'images/pertamina.png',
+                          ],
+                          profileImage: 'images/profile5.png',
+                          like: 89,
+                          comment: 6,
+                        ),
                   ),
                 );
               },
             ),
-
           ],
         ),
       ),

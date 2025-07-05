@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; 
+import '../providers/post_provider.dart';
 
-class UploadPage extends StatelessWidget {
+class UploadPage extends StatefulWidget {
   const UploadPage({super.key});
+
+  @override
+  State<UploadPage> createState() => _UploadPageState();
+}
+
+class _UploadPageState extends State<UploadPage> {
+  final TextEditingController _textController = TextEditingController(); 
+
+  @override
+  void dispose() {
+    _textController.dispose(); 
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final postProvider = Provider.of<PostProvider>(context, listen: false); 
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +50,7 @@ class UploadPage extends StatelessWidget {
                 ),
                 SizedBox(width: 16),
                 Text(
-                  'Valerio Liuz Kienata',
+                  'Valerio Liuz Kienata', 
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: theme.textTheme.bodyMedium!.fontSize,
@@ -46,6 +62,7 @@ class UploadPage extends StatelessWidget {
             SizedBox(height: 24),
             Expanded(
               child: TextField(
+                controller: _textController, 
                 maxLines: null,
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
@@ -65,7 +82,30 @@ class UploadPage extends StatelessWidget {
             ),
             SizedBox(height: 24),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                final String message = _textController.text.trim();
+                if (message.isNotEmpty) {
+                  final newPost = {
+                    'username': 'Valerio Liuz Kienata', 
+                    'time': 'Baru saja', 
+                    'message': message,
+                    'logos': <String>[], 
+                    'profileImage': 'images/profile1.png', 
+                    'like': 0,
+                    'comment': 0,
+                  };
+                  postProvider.addPost(newPost); 
+                  _textController.clear();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Postingan berhasil diunggah!')),
+                  );
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Postingan tidak boleh kosong!')),
+                  );
+                }
+              },
               style: TextButton.styleFrom(
                 backgroundColor: theme.textTheme.headlineSmall!.color,
                 foregroundColor: theme.textTheme.displaySmall!.color,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/post_provider.dart'; // <-- IMPORT INI
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'pages/auth/login_page.dart';
@@ -14,8 +15,11 @@ import 'pages/account_page.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider( // <-- UBAH DARI ChangeNotifierProvider MENJADI MultiProvider
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => PostProvider()), // <-- TAMBAHKAN PostProvider DI SINI
+      ],
       child: const MyApp(),
     ),
   );
@@ -31,6 +35,7 @@ class MyApp extends StatelessWidget {
       title: 'LogoDesain',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
+        // ... (tema terang Anda tetap sama)
         scaffoldBackgroundColor: Color(0xFFFFFFFF),
         cardColor: Color(0xFFF9FAFB),
         dividerColor: Color(0xFFD1E7FF),
@@ -61,6 +66,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       darkTheme: ThemeData.dark().copyWith(
+        // ... (tema gelap Anda tetap sama)
         scaffoldBackgroundColor: Color(0xFF121212),
         cardColor: Color(0xFF1A1A1A),
         dividerColor: Color(0xFF2C2C2C),

@@ -7,7 +7,8 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -37,26 +38,22 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Nama Pengguna
                 InputField2(
                   icon: Icons.person,
                   hint: 'Nama pengguna',
                   controller: usernameController,
                 ),
-                // Email
                 InputField2(
                   icon: Icons.email,
                   hint: 'Email',
                   controller: emailController,
                 ),
-                // Kata sandi
                 InputField2(
                   icon: Icons.lock,
                   hint: 'Kata sandi',
                   controller: passwordController,
                   obscureText: true,
                 ),
-                // Konfirmasi kata sandi
                 InputField2(
                   icon: Icons.lock_outline,
                   hint: 'Konfirmasi kata sandi',
@@ -64,7 +61,6 @@ class RegisterPage extends StatelessWidget {
                   obscureText: true,
                 ),
                 const SizedBox(height: 24),
-                // Tombol Daftar
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -72,15 +68,89 @@ class RegisterPage extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 14),
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.blue.shade900,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: () {
-                      // Tambahkan validasi jika ingin
+                      final username = usernameController.text.trim();
+                      final email = emailController.text.trim();
+                      final password = passwordController.text.trim();
+                      final confirmPassword =
+                          confirmPasswordController.text.trim();
+                      final emailRegex =
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+
+                      if (username.isEmpty ||
+                          email.isEmpty ||
+                          password.isEmpty ||
+                          confirmPassword.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Semua kolom harus diisi',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (!RegExp(emailRegex).hasMatch(email)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Format email tidak valid',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (password.length < 6) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Kata sandi minimal 6 karakter',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (password != confirmPassword) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Konfirmasi kata sandi tidak cocok',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
                             'Akun berhasil didaftar',
-                            style: theme.textTheme.displayMedium,
+                            style: theme.textTheme.displayMedium?.copyWith(
+                              color: Colors.white,
+                            ), 
                           ),
                           backgroundColor: Colors.green.shade800,
                         ),
@@ -91,7 +161,6 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Sudah punya akun - Start
                 Text(
                   'Sudah memiliki akun',
                   style: TextStyle(color: Colors.white),
@@ -101,18 +170,16 @@ class RegisterPage extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: BorderSide(color: Colors.white),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 32,
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   child: Text('Masuk'),
                 ),
-                // Sudah punya akun - End
               ],
             ),
           ),
