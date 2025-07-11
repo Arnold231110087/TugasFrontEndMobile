@@ -38,7 +38,10 @@ class _DesignerAccountPageState extends State<DesignerAccountPage> {
     return {
       'username': widget.designerName,
       'profileImage': widget.imageAsset,
-      'messages': <Map<String, dynamic>>[], 
+      'messages':
+          <
+            Map<String, dynamic>
+          >[], 
     };
   }
 
@@ -251,7 +254,8 @@ class _DesignerAccountPageState extends State<DesignerAccountPage> {
                               MaterialPageRoute(
                                 builder:
                                     (context) => ChatDetailPage(
-                                      chat: _getChatDataForDesigner(),
+                                      chat:
+                                          _getChatDataForDesigner(),
                                     ),
                               ),
                             );

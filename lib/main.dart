@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
-import 'providers/post_provider.dart'; // <-- IMPORT INI
+import 'providers/post_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'pages/auth/login_page.dart';
@@ -15,10 +15,10 @@ import 'pages/account_page.dart';
 
 void main() {
   runApp(
-    MultiProvider( // <-- UBAH DARI ChangeNotifierProvider MENJADI MultiProvider
+    MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => PostProvider()), // <-- TAMBAHKAN PostProvider DI SINI
+        ChangeNotifierProvider(create: (_) => PostProvider()),
       ],
       child: const MyApp(),
     ),
@@ -35,7 +35,6 @@ class MyApp extends StatelessWidget {
       title: 'LogoDesain',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
-        // ... (tema terang Anda tetap sama)
         scaffoldBackgroundColor: Color(0xFFFFFFFF),
         cardColor: Color(0xFFF9FAFB),
         dividerColor: Color(0xFFD1E7FF),
@@ -44,12 +43,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFF1E40AF),
           foregroundColor: Color(0xFFFFFFFF),
         ),
-        popupMenuTheme: PopupMenuThemeData(
-          color: Color(0xFFFFFFFF),
-        ),
-        dialogTheme: DialogThemeData(
-          backgroundColor: Color(0xFFFFFFFF),
-        ),
+        popupMenuTheme: PopupMenuThemeData(color: Color(0xFFFFFFFF)),
+        dialogTheme: DialogThemeData(backgroundColor: Color(0xFFFFFFFF)),
         textTheme: TextTheme(
           displayLarge: TextStyle(color: Color(0xFFFFFFFF), fontSize: 18),
           displayMedium: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),
@@ -66,7 +61,6 @@ class MyApp extends StatelessWidget {
         ),
       ),
       darkTheme: ThemeData.dark().copyWith(
-        // ... (tema gelap Anda tetap sama)
         scaffoldBackgroundColor: Color(0xFF121212),
         cardColor: Color(0xFF1A1A1A),
         dividerColor: Color(0xFF2C2C2C),
@@ -75,12 +69,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFF121212),
           foregroundColor: Color(0xFFE0E0E0),
         ),
-        popupMenuTheme: PopupMenuThemeData(
-          color: Color(0xFF121212),
-        ),
-        dialogTheme: DialogThemeData(
-          backgroundColor: Color(0xFF121212),
-        ),
+        popupMenuTheme: PopupMenuThemeData(color: Color(0xFF121212)),
+        dialogTheme: DialogThemeData(backgroundColor: Color(0xFF121212)),
         textTheme: TextTheme(
           displayLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
           displayMedium: TextStyle(color: Color(0xFFE0E0E0), fontSize: 14),
@@ -139,7 +129,7 @@ class _MainNavigationState extends State<MainNavigation> {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
