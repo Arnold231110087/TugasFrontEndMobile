@@ -1,19 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../components/input_field_2_component.dart';
+import '../../services/database.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final DatabaseHelper db = DatabaseHelper();
+
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    final theme = Theme.of(context);
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final emailRegex =
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+
+    if (email.isEmpty || password.isEmpty) {
+      _showSnack('Email dan kata sandi tidak boleh kosong', theme);
+      return;
+    }
+
+    if (email.length > 50) {
+      _showSnack('Email terlalu panjang', theme);
+      return;
+    }
+
+    if (!RegExp(emailRegex).hasMatch(email)) {
+      _showSnack('Email tidak valid', theme);
+      return;
+    }
+
+    if (password.length < 6) {
+      _showSnack('Kata sandi minimal 6 karakter', theme);
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final user = await db.login(email, password);
+
+      if (user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('is_logged_in', true);
+        await prefs.setString('username', user['username']);
+        await prefs.setString('email', user['email']);
+
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/');
+      } else {
+        final emailExists = await db.checkEmailExists(email);
+        if (!emailExists) {
+          _showSnack('Email belum terdaftar, silakan daftar dulu', theme);
+        } else {
+          _showSnack('Email atau kata sandi salah', theme);
+        }
+      }
+    } catch (e) {
+      _showSnack('Terjadi kesalahan: $e', theme);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnack(String message, ThemeData theme) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return WillPopScope(
-      onWillPop: () async => false, // mencegah tombol back ke onboarding
+      onWillPop: () async => false,
       child: Scaffold(
         body: Container(
           decoration: const BoxDecoration(
@@ -28,7 +111,6 @@ class LoginPage extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Logo
                   Container(
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: const BoxDecoration(
@@ -41,16 +123,16 @@ class LoginPage extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: ClipOval(
                         child: Image.asset(
-                          "images/logo.jpg",
+                          "assets/images/logo.jpg",
                           width: 100,
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  Text(
+                  const Text(
                     'Selamat datang di',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const Text(
                     'LOGODESAIN',
@@ -62,14 +144,11 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
 
-                  // Email
                   InputField2(
                     icon: Icons.email,
                     hint: 'Email',
                     controller: emailController,
                   ),
-
-                  // Password
                   InputField2(
                     icon: Icons.lock,
                     hint: 'Kata sandi',
@@ -78,7 +157,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Tombol Login
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -90,51 +168,21 @@ class LoginPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () async {
-                        final email = emailController.text.trim();
-                        final password = passwordController.text.trim();
-                        final emailRegex =
-                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-
-                        if (email.isEmpty || password.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Email dan password tidak boleh kosong',
-                                style: theme.textTheme.bodyMedium,
+                      onPressed: _isLoading ? null : _login,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.blue,
                               ),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-
-                        if (!RegExp(emailRegex).hasMatch(email)) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Email tidak valid',
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-
-                        // Simpan status login
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool('is_logged_in', true);
-
-                        // Navigasi ke home page
-                        Navigator.pushReplacementNamed(context, '/');
-                      },
-                      child: const Text('Masuk'),
+                            )
+                          : const Text('Masuk'),
                     ),
                   ),
                   const SizedBox(height: 8),
 
-                  // Lupa kata sandi
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton(
@@ -149,7 +197,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // Belum punya akun?
                   const Text(
                     'Belum memiliki akun',
                     style: TextStyle(color: Colors.white),

@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       backgroundColor: Colors.white,
                       child: ClipOval(
                         child: Image.asset(
-                          "images/logo.jpg",
+                          "assets/images/logo.jpg",
                           width: 100,
                           fit: BoxFit.cover,
                         ),

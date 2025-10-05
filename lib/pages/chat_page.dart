@@ -16,7 +16,7 @@ class _ChatPageState extends State<ChatPage> {
   final List<Map<String, dynamic>> _allChats = [
     {
       'username': 'Kevin Durant',
-      'profileImage': 'images/profile3.png',
+      'profileImage': 'assets/images/profile3.png',
       'messages': [
         {'sender': 'you', 'time': '2 jam lalu', 'message': 'Saya ingin sebuah logo yang unik'},
         {'sender': 'user', 'time': '58 menit lalu', 'message': 'Boleh kang, ingin logo seperti apa?'},
@@ -33,7 +33,7 @@ class _ChatPageState extends State<ChatPage> {
     },
     {
       'username': 'Rendy',
-      'profileImage': 'images/profile5.png',
+      'profileImage': 'assets/images/profile5.png',
       'messages': [
         {'sender': 'user', 'time': '8 jam lalu', 'message': 'Halo mas, saya ingin request logo bisa?'},
         {'sender': 'you', 'time': '8 jam lalu', 'message': 'Bisa atuh kang. Ingin logo seperti apa?'},

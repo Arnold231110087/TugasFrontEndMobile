@@ -8,9 +8,9 @@ class SalesPage extends StatelessWidget {
     {
       'username': 'Rendy',
       'time': '3 jam lalu',
-      'rating': 5,
+      'rating': 5.0,
       'message': 'Logonya bagus. Sesuai dengan ekspetasiku. Designer juga sangat profesional, ramah, dan bertanggung jawab. Very good!',
-      'profileImage': 'images/profile1.png',
+      'profileImage': 'assets/images/profile1.png',
       'like': 0,
       'comment': 1,
     },

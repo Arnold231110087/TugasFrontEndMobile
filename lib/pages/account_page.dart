@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/theme_provider.dart';
+import '../providers/post_provider.dart';
+import '../auth/auth_service.dart';
 import 'edit_profile_page.dart';
 import 'change_password_page.dart';
 import 'about_page.dart';
+import 'history_page.dart';
 import 'account_status_page.dart';
 import 'policy_page.dart';
 import 'help_page.dart';
@@ -21,6 +25,20 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   int selectedTab = 0;
+  String? _userEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEmail();
+  }
+
+  Future<void> _loadUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userEmail = prefs.getString('email') ?? 'Pengguna';
+    });
+  }
 
   final List<Map<String, dynamic>> drawers = [
     {
@@ -29,7 +47,7 @@ class _AccountPageState extends State<AccountPage> {
         {'title': 'Ubah profil', 'icon': Icons.person, 'page': EditProfilePage()},
         {'title': 'Ubah kata sandi', 'icon': Icons.lock, 'page': ChangePasswordPage()},
         {'title': 'Privasi', 'icon': Icons.privacy_tip},
-        {'title': 'Notifikasi', 'icon': Icons.notifications},
+        {'title': 'Histori', 'icon': Icons.history, 'page': HistoryPage()},
       ],
     },
     {
@@ -57,7 +75,7 @@ class _AccountPageState extends State<AccountPage> {
     },
   ];
 
-  final Map<String, double> stats = {
+  final Map<String, int> stats = {
     'penjualan': 1,
     'pengikut': 2,
     'mengikuti': 3,
@@ -67,6 +85,18 @@ class _AccountPageState extends State<AccountPage> {
     {'icon': Icons.post_add, 'page': PostPage()},
     {'icon': Icons.sell, 'page': SalesPage()},
   ];
+
+  Future<void> _logout(BuildContext context) async {
+    await AuthService.logout();
+
+    if (context.mounted) {
+      Provider.of<PostProvider>(context, listen: false).clearPosts();
+    }
+
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,22 +134,18 @@ class _AccountPageState extends State<AccountPage> {
       ),
       endDrawer: Drawer(
         backgroundColor: theme.scaffoldBackgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.zero)),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.zero),
+        ),
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.dark_mode,
-                  color: theme.textTheme.bodySmall!.color,
-                ),
+                Icon(Icons.dark_mode, color: theme.textTheme.bodySmall!.color),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    'Mode gelap',
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  child: Text('Mode gelap', style: theme.textTheme.bodyMedium),
                 ),
                 Switch(
                   inactiveTrackColor: theme.scaffoldBackgroundColor,
@@ -132,25 +158,45 @@ class _AccountPageState extends State<AccountPage> {
                 ),
               ],
             ),
-            SizedBox(height: 24),
-            ...drawers.expand<Widget>((drawer) => [
-              DrawerSection(
-                section: drawer['section'],
-                tiles: drawer['tiles'],
-              ),
-              const SizedBox(height: 16),
-            ]).toList()..removeLast(),
-            SizedBox(height: 40),
+            const SizedBox(height: 24),
+            ...drawers
+                .expand<Widget>(
+                  (drawer) => [
+                    DrawerSection(section: drawer['section'], tiles: drawer['tiles']),
+                    const SizedBox(height: 16),
+                  ],
+                )
+                .toList()
+              ..removeLast(),
+            const SizedBox(height: 40),
             TextButton.icon(
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(themeProvider.isDarkMode ? Color(0xFFE11D48) : Color(0xFFDC2626)),
+                backgroundColor: WidgetStateProperty.all(
+                  themeProvider.isDarkMode
+                      ? const Color(0xFFE11D48)
+                      : const Color(0xFFDC2626),
+                ),
                 foregroundColor: WidgetStateProperty.all(theme.textTheme.displayMedium!.color),
                 textStyle: WidgetStateProperty.all(theme.textTheme.displayMedium),
               ),
-              label: Text('Keluar'),
-              icon: Icon(Icons.logout),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
+              label: const Text('Keluar'),
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                // konfirmasi dulu
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Konfirmasi'),
+                    content: const Text('Apakah kamu yakin ingin keluar dari akun ini?'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+                      TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Keluar')),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  _logout(context);
+                }
               },
             ),
           ],
@@ -160,10 +206,7 @@ class _AccountPageState extends State<AccountPage> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 24,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -171,7 +214,7 @@ class _AccountPageState extends State<AccountPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const CircleAvatar(
-                        backgroundImage: AssetImage('images/profile1.png'),
+                        backgroundImage: AssetImage('assets/images/profile1.png'),
                         radius: 40,
                       ),
                       const SizedBox(width: 24),
@@ -180,35 +223,37 @@ class _AccountPageState extends State<AccountPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Valerio Liuz Kienata',
+                              _userEmail ?? 'Memuat...',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: theme.textTheme.bodyMedium!.fontSize,
                                 color: theme.textTheme.bodyMedium!.color,
                               ),
                             ),
-                            SizedBox(height: 12),
+                            const SizedBox(height: 12),
                             Row(
                               children: [
-                                ...stats.entries.expand<Widget>((entry) => [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        entry.value.toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: theme.textTheme.bodyMedium!.fontSize,
-                                          color: theme.textTheme.bodyMedium!.color,
+                                ...stats.entries
+                                    .expand<Widget>(
+                                      (entry) => [
+                                        Column(
+                                          children: [
+                                            Text(
+                                              entry.value.toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: theme.textTheme.bodyMedium!.fontSize,
+                                                color: theme.textTheme.bodyMedium!.color,
+                                              ),
+                                            ),
+                                            Text(entry.key, style: theme.textTheme.labelSmall),
+                                          ],
                                         ),
-                                      ),
-                                      Text(
-                                        entry.key,
-                                        style: theme.textTheme.labelSmall,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 32),
-                                ]).toList()..removeLast(),
+                                        const SizedBox(width: 32),
+                                      ],
+                                    )
+                                    .toList()
+                                  ..removeLast(),
                               ],
                             ),
                           ],
@@ -216,7 +261,7 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Text(
                     'A student trying to become a designer',
                     style: theme.textTheme.bodyMedium,
@@ -237,16 +282,14 @@ class _AccountPageState extends State<AccountPage> {
                       setState(() {
                         selectedTab = index;
                       });
-                    }
+                    },
                   );
                 }),
               ],
             ),
+            const Divider(),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 24,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: sections[selectedTab]['page'],
             ),
           ],

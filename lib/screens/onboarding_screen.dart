@@ -16,17 +16,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       'title': 'Selamat Datang di LogoDesain',
       'desc': 'Platform yang menghubungkan klien dan desainer logo profesional.',
-      'image': 'images/onboarding1.png',
+      'image': 'assets/images/onboarding1.png',
     },
     {
       'title': 'Temukan Desain Berkualitas',
       'desc': 'Jelajahi portofolio dan temukan desain impianmu.',
-      'image': 'images/onboarding2.png',
+      'image': 'assets/images/onboarding2.png',
     },
     {
       'title': 'Bangun Reputasi dan Kolaborasi',
       'desc': 'Gunakan fitur komunitas untuk belajar dan berkembang bersama.',
-      'image': 'images/onboarding3.png',
+      'image': 'assets/images/onboarding3.png',
     },
   ];
 
@@ -140,7 +140,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             child: const Text("Lewati"),
                           )
-                        : const SizedBox(width: 64), // agar tombol seimbang
+                        : const SizedBox(width: 64),
                     ElevatedButton(
                       onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(

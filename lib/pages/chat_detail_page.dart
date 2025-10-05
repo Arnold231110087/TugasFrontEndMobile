@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../components/chat_bubble_component.dart';
 
@@ -14,31 +15,66 @@ class ChatDetailPage extends StatefulWidget {
 }
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  late StreamController<List<Map<String, dynamic>>> _messageStreamController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.chat['messages'] ??= [];
+
+    _messageStreamController =
+        StreamController<List<Map<String, dynamic>>>.broadcast();
+
+    _messageStreamController.add(
+      List<Map<String, dynamic>>.from(widget.chat['messages']),
+    );
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    _messageStreamController.close();
+    super.dispose();
+  }
+
+  void _sendMessage() {
+    if (_messageController.text.trim().isEmpty) return;
+
+    final newMessage = {
+      'sender': 'you',
+      'time': 'baru saja',
+      'message': _messageController.text.trim(),
+    };
+
+    widget.chat['messages'].add(newMessage);
+
+    _messageStreamController
+        .add(List<Map<String, dynamic>>.from(widget.chat['messages']));
+
+    _messageController.clear();
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Pesan terkirim"),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-
-    final List<Map<String, dynamic>> messages = widget.chat['messages'];
-    List<Widget> chatWidgets = [];
-
-    for (int i = 0; i < messages.length; i++) {
-      final Map<String, dynamic> current = messages[i];
-      final String? previousSender = i > 0 ? messages[i - 1]['sender'] : null;
-
-      if (previousSender != null) {
-        chatWidgets.add(SizedBox(
-          height: previousSender == 'system' || current['sender'] == 'system'
-          ? 24
-          : current['sender'] == previousSender ? 4 : 12,
-        ));
-      }
-
-      chatWidgets.add(ChatBubble(
-        chat: current,
-        username: widget.chat['username'],
-        profileImage: widget.chat['profileImage'],
-      ));
-    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -48,7 +84,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(backgroundImage: AssetImage(widget.chat['profileImage'])),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Text(
               widget.chat['username'],
               style: theme.textTheme.displayLarge,
@@ -68,40 +104,22 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 PopupMenuItem(
                   value: 'hapus',
                   child: ListTile(
-                    leading: Icon(
-                      Icons.delete,
-                      color: theme.textTheme.bodySmall!.color,
-                    ),
-                    title: Text(
-                      'Hapus obrolan',
-                      style: theme.textTheme.bodyMedium,
-                    ),
+                    leading: Icon(Icons.delete, color: theme.textTheme.bodySmall!.color),
+                    title: Text('Hapus obrolan', style: theme.textTheme.bodyMedium),
                   ),
                 ),
                 PopupMenuItem(
                   value: 'senyap',
                   child: ListTile(
-                    leading: Icon(
-                      Icons.notifications_off,
-                      color: theme.textTheme.bodySmall!.color,
-                    ),
-                    title: Text(
-                      'Mode senyap',
-                      style: theme.textTheme.bodyMedium,
-                    ),
+                    leading: Icon(Icons.notifications_off, color: theme.textTheme.bodySmall!.color),
+                    title: Text('Mode senyap', style: theme.textTheme.bodyMedium),
                   ),
                 ),
                 PopupMenuItem(
                   value: 'blokir',
                   child: ListTile(
-                    leading: Icon(
-                      Icons.block,
-                      color: theme.textTheme.bodySmall!.color,
-                    ),
-                    title: Text(
-                      'Blokir pengguna',
-                      style: theme.textTheme.bodyMedium,
-                    ),
+                    leading: Icon(Icons.block, color: theme.textTheme.bodySmall!.color),
+                    title: Text('Blokir pengguna', style: theme.textTheme.bodyMedium),
                   ),
                 ),
               ],
@@ -113,44 +131,68 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         child: Column(
           children: [
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 24,
-                ),
-                children: chatWidgets,
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: _messageStreamController.stream,
+                initialData:
+                    List<Map<String, dynamic>>.from(widget.chat['messages']),
+                builder: (context, snapshot) {
+                  final messages = snapshot.data ?? [];
+                  List<Widget> chatWidgets = [];
+
+                  for (int i = 0; i < messages.length; i++) {
+                    final current = messages[i];
+                    final String? previousSender =
+                        i > 0 ? messages[i - 1]['sender'] : null;
+
+                    if (previousSender != null) {
+                      chatWidgets.add(SizedBox(
+                        height: previousSender == 'system' ||
+                                current['sender'] == 'system'
+                            ? 24
+                            : current['sender'] == previousSender
+                                ? 4
+                                : 12,
+                      ));
+                    }
+
+                    chatWidgets.add(ChatBubble(
+                      chat: current,
+                      username: widget.chat['username'],
+                      profileImage: widget.chat['profileImage'],
+                    ));
+                  }
+
+                  return ListView(
+                    controller: _scrollController,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                    children: chatWidgets,
+                  );
+                },
               ),
             ),
+
             Container(
               decoration: BoxDecoration(
                 color: theme.appBarTheme.backgroundColor,
                 border: Border(
-                  top: BorderSide(
-                    width: 1,
-                    color: theme.dividerColor,
-                  ),
+                  top: BorderSide(width: 1, color: theme.dividerColor),
                 ),
               ),
-              padding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(
-                      Icons.price_change,
-                      color: theme.textTheme.displaySmall!.color,
-                    ),
+                    icon: Icon(Icons.price_change,
+                        color: theme.textTheme.displaySmall!.color),
                     onPressed: () {
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          title: Text(
-                            'Ajukan Transaksi',
-                            style: theme.textTheme.bodyLarge,
-                          ),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          title: Text('Ajukan Transaksi',
+                              style: theme.textTheme.bodyLarge),
                           content: TextField(
                             style: theme.textTheme.bodyMedium,
                             keyboardType: TextInputType.number,
@@ -159,29 +201,24 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                               prefixText: 'Rp  ',
                               labelText: 'Harga',
                               labelStyle: theme.textTheme.labelMedium,
-                              focusColor: theme.textTheme.headlineSmall!.color,
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                  width: 2,
-                                  color: theme.textTheme.headlineSmall!.color!,
-                                ),
+                                    width: 2,
+                                    color:
+                                        theme.textTheme.headlineSmall!.color!),
                               ),
                             ),
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: Text(
-                                'Batal',
-                                style: theme.textTheme.bodyMedium,
-                              ),
+                              child: Text('Batal',
+                                  style: theme.textTheme.bodyMedium),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: Text(
-                                'Ajukan',
-                                style: theme.textTheme.headlineMedium,
-                              ),
+                              child: Text('Ajukan',
+                                  style: theme.textTheme.headlineMedium),
                             ),
                           ],
                         ),
@@ -189,22 +226,19 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(
-                      Icons.camera_alt,
-                      color: theme.textTheme.displaySmall!.color,
-                    ),
+                    icon: Icon(Icons.camera_alt,
+                        color: theme.textTheme.displaySmall!.color),
                     onPressed: () {},
                   ),
                   IconButton(
-                    icon: Icon(
-                      Icons.mic,
-                      color: theme.textTheme.displaySmall!.color,
-                    ),
+                    icon: Icon(Icons.mic,
+                        color: theme.textTheme.displaySmall!.color),
                     onPressed: () {},
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
+                      controller: _messageController,
                       style: theme.textTheme.bodyMedium,
                       cursorColor: theme.textTheme.headlineSmall!.color,
                       decoration: InputDecoration(
@@ -216,7 +250,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,
                         ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.send),
+                          onPressed: _sendMessage,
+                        ),
                       ),
+                      onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
                 ],

@@ -38,7 +38,6 @@ class PostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Profile Info
               Row(
                 children: [
                   CircleAvatar(backgroundImage: AssetImage(profileImage)),

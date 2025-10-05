@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:path/path.dart';
+
+
 import 'providers/theme_provider.dart';
+import 'providers/post_provider.dart';
+
+
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'pages/auth/login_page.dart';
@@ -12,10 +21,67 @@ import 'pages/upload_page.dart';
 import 'pages/notification_page.dart';
 import 'pages/account_page.dart';
 
-void main() {
+class DatabaseHelper {
+  static final DatabaseHelper instance = DatabaseHelper._init();
+  static Database? _database;
+
+  DatabaseHelper._init();
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDB('myapp.db');
+    return _database!;
+  }
+
+  Future<Database> _initDB(String filePath) async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, filePath);
+
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: _createDB,
+    );
+  }
+
+  Future _createDB(Database db, int version) async {
+    await db.execute('''
+      CREATE TABLE users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<int> insertUser(Map<String, dynamic> row) async {
+    final db = await instance.database;
+    return await db.insert('users', row);
+  }
+
+  Future<Map<String, dynamic>?> getUser(String email, String password) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'users',
+      where: 'email = ? AND password = ?',
+      whereArgs: [email, password],
+    );
+    return result.isNotEmpty ? result.first : null;
+  }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => PostProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -31,21 +97,21 @@ class MyApp extends StatelessWidget {
       title: 'LogoDesain',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
-        scaffoldBackgroundColor: Color(0xFFFFFFFF),
-        cardColor: Color(0xFFF9FAFB),
-        dividerColor: Color(0xFFD1E7FF),
-        appBarTheme: AppBarTheme(
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+        cardColor: const Color(0xFFF9FAFB),
+        dividerColor: const Color(0xFFD1E7FF),
+        appBarTheme: const AppBarTheme(
           elevation: 0,
           backgroundColor: Color(0xFF1E40AF),
           foregroundColor: Color(0xFFFFFFFF),
         ),
-        popupMenuTheme: PopupMenuThemeData(
+        popupMenuTheme: const PopupMenuThemeData(
           color: Color(0xFFFFFFFF),
         ),
-        dialogTheme: DialogThemeData(
+        dialogTheme: const DialogThemeData(
           backgroundColor: Color(0xFFFFFFFF),
         ),
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           displayLarge: TextStyle(color: Color(0xFFFFFFFF), fontSize: 18),
           displayMedium: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),
           displaySmall: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
@@ -61,21 +127,21 @@ class MyApp extends StatelessWidget {
         ),
       ),
       darkTheme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Color(0xFF121212),
-        cardColor: Color(0xFF1A1A1A),
-        dividerColor: Color(0xFF2C2C2C),
-        appBarTheme: AppBarTheme(
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        cardColor: const Color(0xFF1A1A1A),
+        dividerColor: const Color(0xFF2C2C2C),
+        appBarTheme: const AppBarTheme(
           elevation: 0,
           backgroundColor: Color(0xFF121212),
           foregroundColor: Color(0xFFE0E0E0),
         ),
-        popupMenuTheme: PopupMenuThemeData(
+        popupMenuTheme: const PopupMenuThemeData(
           color: Color(0xFF121212),
         ),
-        dialogTheme: DialogThemeData(
+        dialogTheme: const DialogThemeData(
           backgroundColor: Color(0xFF121212),
         ),
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           displayLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
           displayMedium: TextStyle(color: Color(0xFFE0E0E0), fontSize: 14),
           displaySmall: TextStyle(color: Color(0xFFE0E0E0), fontSize: 12),
@@ -93,7 +159,7 @@ class MyApp extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       initialRoute: '/splash',
       routes: {
-        '/': (context) => MainNavigation(),
+        '/': (context) => const MainNavigation(),
         '/splash': (context) => const SplashScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => LoginPage(),
@@ -146,25 +212,70 @@ class _MainNavigationState extends State<MainNavigation> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Beranda',
+            tooltip: 'Beranda',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Cari',
+            tooltip: 'Cari',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_box_outlined),
             label: 'Unggah',
+            tooltip: 'Unggah',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications_none),
             label: 'Notifikasi',
+            tooltip: 'Notifikasi',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Akun',
+            tooltip: 'Akun',
           ),
         ],
       ),
     );
+  }
+}
+
+class AuthService {
+  static Future<bool> login(String email, String password) async {
+    if (!_isValidEmail(email)) return false;
+
+    final user = await DatabaseHelper.instance.getUser(email, password);
+    if (user != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('email', email);
+      return true;
+    }
+    return false;
+  }
+
+  static Future<void> register(String email, String password) async {
+    if (!_isValidEmail(email)) {
+      throw Exception("Email tidak valid");
+    }
+    await DatabaseHelper.instance.insertUser({
+      'email': email,
+      'password': password,
+    });
+  }
+
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
+
+  static Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false;
+  }
+
+  static bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return emailRegex.hasMatch(email);
   }
 }

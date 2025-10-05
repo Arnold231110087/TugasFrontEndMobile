@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/password_input_component.dart';
 
 class ChangePasswordPage extends StatefulWidget {
-  const ChangePasswordPage({Key? key}) : super(key: key);
+  const ChangePasswordPage({super.key});
 
   @override
   State<ChangePasswordPage> createState() => _ChangePasswordPageState();
@@ -52,17 +52,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textColor = theme.textTheme.bodyMedium?.color;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Ganti Password"),
-        backgroundColor: theme.colorScheme.background,
-        foregroundColor: textColor,
         elevation: 0,
       ),
-      backgroundColor: theme.colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
