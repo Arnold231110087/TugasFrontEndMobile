@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../services/database.dart';
 import '../components/input_field_1_component.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -12,6 +12,8 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final DatabaseHelper db = DatabaseHelper(); 
+  
   final TextEditingController nameController =
       TextEditingController(text: 'Valerio Liuz Kienata');
   final TextEditingController emailController =
@@ -30,7 +32,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       dobController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
     }
   }
-
+  
   Future<void> _loadProfileData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -38,11 +40,43 @@ class _EditProfilePageState extends State<EditProfilePage> {
       emailController.text = prefs.getString('email') ?? 'valerio.kongxifacai@gmail.com';
     });
   }
+    void _showSnack(String message, ThemeData theme) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+        ),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
 
   Future<void> _saveProfileData() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', nameController.text);
-    await prefs.setString('email', emailController.text);
+    final theme = Theme.of(context);
+    final id = prefs.getInt('id');
+    if (id != null) {
+      Map<String, dynamic> newUser = {
+        'username': nameController.text,
+        'email': emailController.text,
+      };
+      final result = await db.updateProfile(id, newUser);
+      final usernameCheck = await db.checkUsernameExist(nameController.text);
+      final emailCheck = await db.checkEmailExists(emailController.text);
+      if (result > 0 && usernameCheck && emailCheck) {
+        prefs.setBool('username', usernameCheck);
+        prefs.setBool('email', emailCheck);
+        await prefs.setString('username',nameController.text);
+        await prefs.setString('email',emailController.text) ;
+        await _loadProfileData();
+        _showSnack('Data Berhasil Diubah', theme);
+      }
+      else{
+        prefs.setBool('username', usernameCheck);
+        prefs.setBool('email', emailCheck);
+      }
+    }
   }
 
   @override
@@ -119,6 +153,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           InputField1(
             label: 'Nama',
             controller: nameController,
+            
           ),
           const SizedBox(height: 24),
           InputField1(

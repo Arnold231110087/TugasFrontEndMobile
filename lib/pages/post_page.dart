@@ -4,7 +4,7 @@ import '../components/post_card_component.dart';
 import '../providers/post_provider.dart'; 
 
 class PostPage extends StatelessWidget {
-  PostPage({super.key});
+  const PostPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class PostPage extends StatelessWidget {
                     const SizedBox(height: 24),
                   ],
                 )
-                .toList(),
+                ,
           ],
         );
       },

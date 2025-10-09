@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   Future<void> _login() async {
-    final theme = Theme.of(context);
+    final theme = Theme.of(context);  
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final emailRegex =
@@ -54,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setBool('is_logged_in', true);
         await prefs.setString('username', user['username']);
         await prefs.setString('email', user['email']);
+        await prefs.setInt('id', user['id']);
 
         if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/');
