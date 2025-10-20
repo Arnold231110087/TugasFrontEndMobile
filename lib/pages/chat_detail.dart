@@ -4,7 +4,7 @@ class ChatDetailPage extends StatelessWidget {
   final String name;
   final Color primaryColor = const Color(0xFF1E3A8A);
 
-  ChatDetailPage({super.key, required this.name});
+  const ChatDetailPage({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
