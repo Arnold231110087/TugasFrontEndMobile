@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:logo_marketplace/main.dart';
+import 'package:mobile_arnold/main.dart';
+// import 'package:logo_marketplace/main.dart';
 
 void main() {
   testWidgets('Login page loads correctly', (WidgetTester tester) async {
