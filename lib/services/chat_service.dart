@@ -40,7 +40,7 @@ class ChatService {
       _chats[index]['lastMessage'] = message;
       _chats[index]['lastTime'] = msg['time'];
 >>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
-      _chatController.add(List.from(_chats));
+      chatController.add(List.from(_chats));
     }
   }
 }

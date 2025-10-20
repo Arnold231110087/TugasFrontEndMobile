@@ -132,7 +132,7 @@ void dispose() {
   super.dispose();
 }
 =======
-  bool _confirmed = false;
+  final bool _confirmed = false;
 
   void _showDeleteDialog() {
     showDialog(

@@ -88,7 +88,7 @@ class _SearchPageState extends State<SearchPage>
 =======
     _tabController = TabController(length: 2, vsync: this);
 >>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
-    _searchController.addListener(_onSearchChanged);
+    searchController.addListener(_onSearchChanged);
   }
 
   @override
@@ -179,7 +179,7 @@ class _SearchPageState extends State<SearchPage>
   }
 
 >>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
-  void _deleteSearchedAccount(int index) {
+  void deleteSearchedAccount(int index) {
     setState(() {
       final String deletedName = _searchedAccounts[index]['name'];
       _searchedAccounts.removeAt(index);
@@ -200,7 +200,7 @@ class _SearchPageState extends State<SearchPage>
   Widget _buildAccountTab(ThemeData theme) {
     return _isSearchingAccount
         ? _noAccountResults
-            ? _buildNoAccountFound(theme)
+            ? buildNoAccountFound(theme)
             : ListView.builder(
                 padding:
                     const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -244,7 +244,7 @@ class _SearchPageState extends State<SearchPage>
                   followsYou: account['followsYou'] ?? false,
                   isFriend: account['isFriend'] ?? false,
                   rating: account['rating'],
-                  onDelete: () => _deleteSearchedAccount(index),
+                  onDelete: () => deleteSearchedAccount(index),
                 );
               }),
               const SizedBox(height: 36),
@@ -265,7 +265,7 @@ class _SearchPageState extends State<SearchPage>
           );
   }
 
-  Widget _buildNoAccountFound(ThemeData theme) {
+  Widget buildNoAccountFound(ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -290,7 +290,7 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
-  Widget _buildLogoTab(ThemeData theme) {
+  Widget buildLogoTab(ThemeData theme) {
     return Column(
       children: [
         if (_isSearchingLogo)
@@ -475,7 +475,7 @@ class _SearchPageState extends State<SearchPage>
                       followsYou: account['followsYou'] ?? false,
                       isFriend: account['isFriend'] ?? false,
                       rating: account['rating'],
-                      onDelete: () => _deleteSearchedAccount(index),
+                      onDelete: () => deleteSearchedAccount(index),
                     );
                   }),
                   const SizedBox(height: 36),
@@ -556,7 +556,7 @@ class _SearchPageState extends State<SearchPage>
           _buildLogoTab(theme),
         ],
       ),
-    );
+    )
   }
 }
 >>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
