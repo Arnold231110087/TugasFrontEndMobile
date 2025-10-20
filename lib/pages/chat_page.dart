@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'chat_detail.dart'; // Ganti sesuai path kamu
+import 'chat_detail_page.dart';
+import '../components/chat_card_component.dart';
+import '../services/chat_service.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -9,22 +11,50 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final Color primaryColor = const Color(0xFF1E3A8A);
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
+  final ChatService _chatService = ChatService();
 
-  final List<Map<String, String>> _allChats = [
-    {
-      'name': 'Kevin Durant',
-      'message': 'Kevin durant ingin melakukan deal',
-      'image': 'images/profile3.png',
-    },
-    {
-      'name': 'Rendy',
-      'message': 'Anda: Jika masih belum puas, silahkan chat saya saja',
-      'image': 'images/profile5.png',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    if (_chatService.chats.isEmpty) {
+      _chatService.setInitialChats([
+        {
+          'username': 'Kevin Durant',
+          'profileImage': 'assets/images/profile3.png',
+          'lastMessage': 'Boleh kang, ingin logo seperti apa?',
+          'lastTime': '58 menit lalu',
+          'messages': [
+            {'sender': 'you', 'time': '2 jam lalu', 'message': 'Saya ingin sebuah logo yang unik'},
+            {'sender': 'user', 'time': '58 menit lalu', 'message': 'Boleh kang, ingin logo seperti apa?'},
+            {'sender': 'you', 'time': '50 menit lalu', 'message': 'Logo yang unik untuk team esport'},
+            {'sender': 'user', 'time': '49 menit lalu', 'message': 'Sip, untuk harganya 350 rb yaa'},
+            {
+              'sender': 'system',
+              'by': 'user',
+              'time': '48 menit lalu',
+              'type': 'proposal',
+              'amount': 350000
+            },
+          ],
+        },
+        {
+          'username': 'Rendy',
+          'profileImage': 'assets/images/profile5.png',
+          'lastMessage': 'Saya ingin logo dengan elemen hijau',
+          'lastTime': '8 jam lalu',
+          'messages': [
+            {'sender': 'user', 'time': '8 jam lalu', 'message': 'Halo mas, saya ingin request logo bisa?'},
+            {'sender': 'you', 'time': '8 jam lalu', 'message': 'Bisa atuh kang. Ingin logo seperti apa?'},
+            {'sender': 'you', 'time': '8 jam lalu', 'message': 'Silahkan ditulis aja semua aspek'},
+            {'sender': 'user', 'time': '8 jam lalu', 'message': 'Saya ingin logo dengan elemen hijau'},
+          ],
+        },
+      ]);
+    }
+  }
 
   @override
   void dispose() {
@@ -34,118 +64,97 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredChats = _isSearching
-        ? _allChats
-            .where((chat) => chat['name']!
-                .toLowerCase()
-                .contains(_searchController.text.toLowerCase()))
-            .toList()
-        : _allChats;
+    final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F3FF),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: primaryColor,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: true,
         title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                style: const TextStyle(color: Colors.white),
-                cursorColor: Colors.white,
-                decoration: const InputDecoration(
-                  hintText: 'Cari...',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  border: InputBorder.none,
+            ? Container(
+                height: 40,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                onChanged: (_) => setState(() {}),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: theme.textTheme.bodyMedium,
+                  cursorColor: theme.textTheme.headlineSmall?.color,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: theme.textTheme.bodySmall?.color),
+                    hintText: 'Cari',
+                    hintStyle: theme.textTheme.labelMedium,
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
               )
-            : const Text(
-                'Obrolan',
+            : Text(
+                'OBROLAN',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  fontSize: theme.textTheme.displayLarge?.fontSize,
+                  color: theme.textTheme.displayLarge?.color,
                 ),
               ),
         actions: [
-          _isSearching
-              ? IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = false;
-                      _searchController.clear();
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: const Icon(Icons.search, color: Colors.white),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = true;
-                    });
-                  },
-                ),
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: IconButton(
+              icon: Icon(
+                _isSearching ? Icons.close : Icons.search,
+                color: theme.textTheme.displaySmall?.color,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isSearching = !_isSearching;
+                  _searchController.clear();
+                });
+              },
+            ),
+          ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: filteredChats.length,
-        itemBuilder: (context, index) {
-          final chat = filteredChats[index];
-          return _buildChatCard(
-            name: chat['name']!,
-            message: chat['message']!,
-            imageAsset: chat['image']!,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChatDetailPage(name: chat['name']!),
-                ),
+      body: StreamBuilder<List<Map<String, dynamic>>>(
+        stream: _chatService.chatStream,
+        initialData: _chatService.chats,
+        builder: (context, snapshot) {
+          final chats = snapshot.data ?? [];
+          final filteredChats = _isSearching
+              ? chats
+                  .where((chat) => chat['username']
+                      .toLowerCase()
+                      .contains(_searchController.text.toLowerCase().trim()))
+                  .toList()
+              : chats;
+
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            itemCount: filteredChats.length,
+            itemBuilder: (context, index) {
+              final chat = filteredChats[index];
+              return ChatCard(
+                chat: chat,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => ChatDetailPage(chat: chat)),
+                  );
+                  setState(() {
+                    _isSearching = false;
+                    _searchController.clear();
+                  });
+                },
               );
             },
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildChatCard({
-    required String name,
-    required String message,
-    required String imageAsset,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(backgroundImage: AssetImage(imageAsset), radius: 25),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(message, style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

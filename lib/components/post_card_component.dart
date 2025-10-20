@@ -8,6 +8,7 @@ class PostCard extends StatelessWidget {
   final String profileImage;
   final int like;
   final int comment;
+  final VoidCallback? onTap;
 
   const PostCard({
     super.key,
@@ -18,86 +19,63 @@ class PostCard extends StatelessWidget {
     required this.profileImage,
     required this.like,
     required this.comment,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.dividerColor),
-        borderRadius: BorderRadius.circular(12),
-        color: theme.cardColor,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 3,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(backgroundImage: AssetImage(profileImage)),
-              SizedBox(width: 12),
-              Text(
-                username,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: theme.textTheme.bodyMedium!.fontSize,
-                  color: theme.textTheme.bodyMedium!.color,
-                ),
+              Row(
+                children: [
+                  CircleAvatar(backgroundImage: AssetImage(profileImage)),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(username, style: theme.textTheme.bodyMedium),
+                      Text(time, style: theme.textTheme.labelSmall),
+                    ],
+                  ),
+                ],
               ),
-              Spacer(),
-              Text(
-                time,
-                style: theme.textTheme.labelSmall,
+              const SizedBox(height: 12),
+              Text(message, style: theme.textTheme.bodySmall),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: logos
+                    .map((logo) => Image.asset(logo, height: 40))
+                    .toList(),
               ),
-              SizedBox(width: 16),
-              Icon(
-                Icons.more_vert,
-                color: theme.textTheme.bodySmall!.color,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.favorite_border, size: 18, color: theme.iconTheme.color),
+                  const SizedBox(width: 4),
+                  Text('$like', style: theme.textTheme.labelSmall),
+                  const SizedBox(width: 16),
+                  Icon(Icons.comment_outlined, size: 18, color: theme.iconTheme.color),
+                  const SizedBox(width: 4),
+                  Text('$comment', style: theme.textTheme.labelSmall),
+                ],
               ),
             ],
           ),
-          SizedBox(height: 24),
-          Text(
-            message,
-            style: TextStyle(color: theme.textTheme.bodyLarge!.color),
-          ),
-          if (logos.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Wrap(
-                spacing: 12,
-                children: logos.map((logo) => Image.asset(logo, width: 50)).toList(),
-              ),
-            ),
-          SizedBox(height: 32),
-          Row(
-            children: [
-              Icon(
-                Icons.favorite_border,
-                size: 20,
-                color: theme.textTheme.bodySmall!.color,
-              ),
-              SizedBox(width: 4),
-              Text(
-                like.toString(),
-                style: theme.textTheme.bodyMedium,
-              ),
-              SizedBox(width: 24),
-              Icon(
-                Icons.comment_outlined,
-                size: 20,
-                color: theme.textTheme.bodySmall!.color,
-              ),
-              SizedBox(width: 4),
-              Text(
-                comment.toString(),
-                style: theme.textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }

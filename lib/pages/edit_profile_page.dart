@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/database.dart';
+import '../components/input_field_1_component.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -8,144 +12,203 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final _nameController = TextEditingController(text: "Valerio Liuz Kienata");
-  final _bioController = TextEditingController(
-      text: "Seorang mahasiswa yang sedang berusaha untuk menjadi seorang desainer");
-  final _emailController =
-      TextEditingController(text: "valerio.kongxifacai@gmail.com");
+  final DatabaseHelper db = DatabaseHelper(); 
+  
+  final TextEditingController nameController =
+      TextEditingController(text: 'Valerio Liuz Kienata');
+  final TextEditingController emailController =
+      TextEditingController(text: 'valerio.kongxifacai@gmail.com');
+  final TextEditingController bioController =
+      TextEditingController(text: 'A student trying to become a designer');
+
+  final TextEditingController dobController = TextEditingController();
+  DateTime? _selectedDate = DateTime(2005, 1, 1);
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    _bioController.dispose();
-    _emailController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _loadProfileData();
+    if (_selectedDate != null) {
+      dobController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+    }
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE6ECFF),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.only(
-                  top: 40, left: 16, right: 16, bottom: 20),
-              color: const Color(0xFF0039A6),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back, color: Colors.white),
-                  ),
-                  const SizedBox(width: 16),
-                  const Text(
-                    'Edit Profile',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 45,
-                    backgroundImage: AssetImage('images/profile1.png'),
-                  ),
-                  const SizedBox(height: 10),
-                  TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.camera_alt,
-                        color: Color(0xFF0039A6)),
-                    label: const Text(
-                      'Change image or avatar',
-                      style: TextStyle(
-                        color: Color(0xFF0039A6),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            _buildTextField(label: "Name", controller: _nameController),
-            const SizedBox(height: 16),
-            _buildTextField(label: "Bio", controller: _bioController),
-            const SizedBox(height: 16),
-            _buildTextField(label: "Email", controller: _emailController),
-            const SizedBox(height: 32),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Profil berhasil disimpan')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0039A6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
+  
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nameController.text = prefs.getString('username') ?? 'Valerio Liuz Kienata';
+      emailController.text = prefs.getString('email') ?? 'valerio.kongxifacai@gmail.com';
+    });
+  }
+    void _showSnack(String message, ThemeData theme) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
         ),
+        backgroundColor: Colors.green,
       ),
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Future<void> _saveProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final theme = Theme.of(context);
+    final id = prefs.getInt('id');
+    if (id != null) {
+      Map<String, dynamic> newUser = {
+        'username': nameController.text,
+        'email': emailController.text,
+      };
+      final result = await db.updateProfile(id, newUser);
+      final usernameCheck = await db.checkUsernameExist(nameController.text);
+      final emailCheck = await db.checkEmailExists(emailController.text);
+      if (result > 0 && usernameCheck && emailCheck) {
+        prefs.setBool('username', usernameCheck);
+        prefs.setBool('email', emailCheck);
+        await prefs.setString('username',nameController.text);
+        await prefs.setString('email',emailController.text) ;
+        await _loadProfileData();
+        _showSnack('Data Berhasil Diubah', theme);
+      }
+      else{
+        prefs.setBool('username', usernameCheck);
+        prefs.setBool('email', emailCheck);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    bioController.dispose();
+    dobController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime(2000, 1, 1),
+      firstDate: DateTime(1900, 1, 1),
+      lastDate: DateTime.now(),
+      helpText: 'Pilih Tanggal Lahir',
+      confirmText: 'PILIH',
+      cancelText: 'BATAL',
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        dobController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: Text(
+          'UBAH PROFIL',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: theme.textTheme.displayLarge!.fontSize,
+            color: theme.textTheme.displayLarge!.color,
+          ),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
+          Container(
+            alignment: Alignment.center,
+            child: const CircleAvatar(
+              backgroundImage: AssetImage('assets/images/profile1.png'),
+              radius: 48,
             ),
           ),
-          const SizedBox(height: 6),
-          TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+          const SizedBox(height: 8),
+          Container(
+            alignment: Alignment.center,
+            child: TextButton.icon(
+              onPressed: () {},
+              icon: Icon(
+                Icons.camera_alt,
+                color: theme.textTheme.headlineSmall!.color,
+              ),
+              label: Text(
+                'Change image or avatar',
+                style: theme.textTheme.headlineMedium,
               ),
             ),
+          ),
+          const SizedBox(height: 40),
+          InputField1(
+            label: 'Nama',
+            controller: nameController,
+            
+          ),
+          const SizedBox(height: 24),
+          InputField1(
+            label: 'Email',
+            controller: emailController,
+          ),
+          const SizedBox(height: 24),
+          TextFormField(
+            controller: dobController,
+            style: theme.textTheme.bodyMedium,
+            cursorColor: theme.textTheme.headlineSmall!.color,
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: 'Tanggal Lahir',
+              labelStyle: theme.textTheme.labelMedium,
+              hintText: 'YYYY-MM-DD',
+              suffixIcon: const Icon(Icons.calendar_today),
+              border: UnderlineInputBorder(
+                borderSide: BorderSide(color: theme.dividerColor),
+              ),
+            ),
+            onTap: () => _selectDate(context),
+          ),
+          const SizedBox(height: 24),
+          InputField1(
+            label: 'Bio',
+            controller: bioController,
+          ),
+          const SizedBox(height: 40),
+          TextButton(
+            onPressed: () async {
+              await _saveProfileData();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Profil berhasil disimpan',
+                      style: theme.textTheme.displayMedium,
+                    ),
+                    backgroundColor: Colors.green.shade800,
+                  ),
+                );
+              }
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: theme.textTheme.headlineSmall!.color,
+              foregroundColor: theme.textTheme.displaySmall!.color,
+              textStyle: theme.textTheme.displayMedium,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              minimumSize: const Size.fromHeight(48),
+            ),
+            child: const Text('Simpan'),
           ),
         ],
       ),

@@ -4,11 +4,7 @@ class DrawerSection extends StatelessWidget {
   final String section;
   final List<Map<String, dynamic>> tiles;
 
-  const DrawerSection({
-    super.key,
-    required this.section,
-    required this.tiles,
-  });
+  const DrawerSection({super.key, required this.section, required this.tiles});
 
   @override
   Widget build(BuildContext context) {
@@ -19,28 +15,21 @@ class DrawerSection extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            section,
-            style: theme.textTheme.labelSmall,
-          ),
+          child: Text(section, style: theme.textTheme.labelSmall),
         ),
         ...tiles.map((tile) {
           return ListTile(
-            title: Text(
-              tile['title'],
-              style: theme.textTheme.bodyMedium,
-            ),
+            title: Text(tile['title'], style: theme.textTheme.bodyMedium),
             leading: Icon(
               tile['icon'],
               color: theme.textTheme.bodyMedium!.color,
             ),
             onTap: () {
+              Navigator.of(context).pop();
               if (tile['page'] != null) {
-                Navigator.of(context).pop();
-                Navigator.push(
+                Navigator.of(
                   context,
-                  MaterialPageRoute(builder: (context) => tile['page'])
-                );
+                ).push(MaterialPageRoute(builder: (_) => tile['page']));
               }
             },
           );

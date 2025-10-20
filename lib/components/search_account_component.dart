@@ -6,6 +6,7 @@ class SearchAccount extends StatelessWidget {
   final bool followsYou;
   final bool isFriend;
   final double? rating;
+  final VoidCallback? onDelete;
 
   const SearchAccount({
     super.key,
@@ -14,6 +15,7 @@ class SearchAccount extends StatelessWidget {
     this.followsYou = false,
     this.isFriend = false,
     this.rating,
+    this.onDelete,
   });
 
   @override
@@ -21,15 +23,15 @@ class SearchAccount extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             radius: 24,
-            backgroundImage: AssetImage('images/profile1.png'),
+            backgroundImage: AssetImage('assets/images/profile1.png'),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,13 +44,12 @@ class SearchAccount extends StatelessWidget {
                     color: theme.textTheme.bodyMedium!.color,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
                   followers,
                   style: theme.textTheme.labelSmall,
                 ),
-                if (isFriend || followsYou)
-                  SizedBox(height: 8),
+                if (isFriend || followsYou) const SizedBox(height: 8),
                 if (isFriend)
                   Text(
                     'Teman',
@@ -65,14 +66,20 @@ class SearchAccount extends StatelessWidget {
           if (rating != null)
             Row(
               children: [
-                Icon(Icons.star, color: Colors.amber, size: 14),
-                SizedBox(width: 2),
+                const Icon(Icons.star, color: Colors.amber, size: 14),
+                const SizedBox(width: 2),
                 Text(
                   rating.toString(),
                   style: theme.textTheme.bodySmall,
                 ),
               ],
             ),
+          const SizedBox(width: 20),
+          if (onDelete != null) 
+            IconButton(
+              onPressed: onDelete,
+              icon: const Icon(Icons.cancel),
+            )
         ],
       ),
     );

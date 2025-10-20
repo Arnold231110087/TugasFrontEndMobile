@@ -23,10 +23,10 @@ class _BankPageState extends State<BankPage> {
       'icon': '🏦',
       'description': 'Mandiri, BCA, BNI, dan lainnya',
       'options': [
-        {'name': 'BCA Mobile', 'icon': 'images/bca.png', 'url': 'https://www.bca.co.id'},
-        {'name': 'BNI M-Banking', 'icon': 'images/bni.png', 'url': 'https://www.bni.co.id'},
-        {'name': 'BRI Mobile', 'icon': 'images/bri.png', 'url': 'https://www.bri.co.id'},
-        {'name': 'Mandiri', 'icon': 'images/mandiri.png', 'url': 'https://www.bankmandiri.co.id'},
+        {'name': 'BCA Mobile', 'icon': 'assets/images/bca.png', 'url': 'https://www.bca.co.id'},
+        {'name': 'BNI M-Banking', 'icon': 'assets/images/bni.png', 'url': 'https://www.bni.co.id'},
+        {'name': 'BRI Mobile', 'icon': 'assets/images/bri.png', 'url': 'https://www.bri.co.id'},
+        {'name': 'Mandiri', 'icon': 'assets/images/mandiri.png', 'url': 'https://www.bankmandiri.co.id'},
       ],
     },
     {
@@ -34,9 +34,9 @@ class _BankPageState extends State<BankPage> {
       'icon': '📱',
       'description': 'OVO, DANA, ShopeePay',
       'options': [
-        {'name': 'OVO', 'icon': 'images/ovo.png', 'url': 'https://www.ovo.id'},
-        {'name': 'Dana', 'icon': 'images/dana.png', 'url': 'https://www.dana.id'},
-        {'name': 'Shopee Pay', 'icon': 'images/shopeepay.png', 'url': 'https://shopee.co.id'},
+        {'name': 'OVO', 'icon': 'assets/images/ovo.png', 'url': 'https://www.ovo.id'},
+        {'name': 'Dana', 'icon': 'assets/images/dana.png', 'url': 'https://www.dana.id'},
+        {'name': 'Shopee Pay', 'icon': 'assets/images/shopeepay.png', 'url': 'https://shopee.co.id'},
       ],
     },
   ];
