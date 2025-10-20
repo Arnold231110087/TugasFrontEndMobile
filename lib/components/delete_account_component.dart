@@ -8,7 +8,7 @@ class DeleteAccountSection extends StatefulWidget {
   const DeleteAccountSection({
     super.key
   });
-
+  
   @override
   State < DeleteAccountSection > createState() => _DeleteAccountSectionState();
 }
