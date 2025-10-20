@@ -29,11 +29,17 @@ class ChatService {
         'time': '${now.hour}:${now.minute.toString().padLeft(2, '0')}',
         'message': message,
       };
+<<<<<<< HEAD
 
       _chats[index]['messages'].add(msg);
       _chats[index]['lastMessage'] = message;
       _chats[index]['lastTime'] = msg['time'];
 
+=======
+      _chats[index]['messages'].add(msg);
+      _chats[index]['lastMessage'] = message;
+      _chats[index]['lastTime'] = msg['time'];
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
       _chatController.add(List.from(_chats));
     }
   }

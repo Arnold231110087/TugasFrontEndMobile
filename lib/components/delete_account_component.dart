@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:mobile_arnold/pages/auth/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/database.dart';
 
+=======
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
 
 class DeleteAccountSection extends StatefulWidget {
   const DeleteAccountSection({
     super.key
   });
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
   @override
   State < DeleteAccountSection > createState() => _DeleteAccountSectionState();
 }
 
 class _DeleteAccountSectionState extends State < DeleteAccountSection > {
   final TextEditingController _controller = TextEditingController();
+<<<<<<< HEAD
   final DatabaseHelper db = DatabaseHelper(); 
 
   bool _confirmed = false;
@@ -123,6 +131,59 @@ void dispose() {
   _controller.dispose();
   super.dispose();
 }
+=======
+  bool _confirmed = false;
+
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Konfirmasi Hapus Akun"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Anda yakin ingin menghapus akun? Tindakan ini tidak bisa dibatalkan."),
+                const SizedBox(height: 16),
+                  const Text("Ketik: HAPUS AKUN", style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                      TextField(
+                        controller: _controller,
+                        onChanged: (value) {
+                          setState(() {
+                            _confirmed = value.trim().toUpperCase() == "HAPUS AKUN";
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Tulis di sini...',
+                        ),
+                      ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            TextButton(
+              onPressed: _confirmed ?
+              () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Akun berhasil dihapus (simulasi).")),
+                );
+              } :
+              null,
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text("Hapus Akun"),
+            ),
+          ],
+      ),
+    );
+  }
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,11 @@ class SearchAccount extends StatelessWidget {
   final bool followsYou;
   final bool isFriend;
   final double? rating;
+<<<<<<< HEAD
   final VoidCallback? onDelete; // This is nullable (optional)
+=======
+  final VoidCallback? onDelete;
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
 
   const SearchAccount({
     super.key,
@@ -15,7 +19,11 @@ class SearchAccount extends StatelessWidget {
     this.followsYou = false,
     this.isFriend = false,
     this.rating,
+<<<<<<< HEAD
     this.onDelete, // Initialize the optional callback
+=======
+    this.onDelete,
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
   });
 
   @override
@@ -75,6 +83,7 @@ class SearchAccount extends StatelessWidget {
               ],
             ),
           const SizedBox(width: 20),
+<<<<<<< HEAD
           // <--- NEW: Conditional rendering for the IconButton ---
           if (onDelete != null) // Only show the button if onDelete is provided
             IconButton(
@@ -82,6 +91,13 @@ class SearchAccount extends StatelessWidget {
               icon: const Icon(Icons.cancel),
             )
           // <--- END NEW ---
+=======
+          if (onDelete != null) 
+            IconButton(
+              onPressed: onDelete,
+              icon: const Icon(Icons.cancel),
+            )
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
         ],
       ),
     );

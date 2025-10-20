@@ -94,6 +94,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
+=======
+    final theme = Theme.of(context);
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
 
     return WillPopScope(
       onWillPop: () async => false,

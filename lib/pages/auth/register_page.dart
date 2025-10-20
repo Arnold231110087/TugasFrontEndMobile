@@ -76,6 +76,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
+=======
+    final ThemeData theme = Theme.of(context);
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
 
     return Scaffold(
       body: Container(

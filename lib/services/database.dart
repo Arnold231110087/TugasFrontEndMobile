@@ -91,7 +91,11 @@ class DatabaseHelper {
     return result.isNotEmpty;
   }
 
+<<<<<<< HEAD
   Future<int> updateProfile(int id, Map<String, dynamic> user) async {
+=======
+   Future<int> updateProfile(int id, Map<String, dynamic> user) async {
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
     final db = await database;
     return await db.update(
       'users',
@@ -100,6 +104,7 @@ class DatabaseHelper {
       whereArgs: [id],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+<<<<<<< HEAD
   }
 
   Future<int> deleteAccount(String email) async {
@@ -109,5 +114,8 @@ class DatabaseHelper {
       where: 'email = ?',
       whereArgs: [email],
     );
+=======
+    
+>>>>>>> 352ad9eb32452724fcd256bf48663b160d35c179
   }
 }
