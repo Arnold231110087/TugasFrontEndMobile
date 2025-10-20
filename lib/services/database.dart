@@ -91,7 +91,7 @@ class DatabaseHelper {
     return result.isNotEmpty;
   }
 
-   Future<int> updateProfile(int id, Map<String, dynamic> user) async {
+  Future<int> updateProfile(int id, Map<String, dynamic> user) async {
     final db = await database;
     return await db.update(
       'users',
@@ -100,6 +100,14 @@ class DatabaseHelper {
       whereArgs: [id],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    
+  }
+
+  Future<int> deleteAccount(String email) async {
+    final db = await database;
+    return await db.delete(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email],
+    );
   }
 }

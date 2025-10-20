@@ -61,7 +61,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'username': nameController.text,
         'email': emailController.text,
       };
-      final result = await db.updateProfile(id, newUser);
+      final result = await db.updateProfile(id, newUser); 
       final usernameCheck = await db.checkUsernameExist(nameController.text);
       final emailCheck = await db.checkEmailExists(emailController.text);
       if (result > 0 && usernameCheck && emailCheck) {
