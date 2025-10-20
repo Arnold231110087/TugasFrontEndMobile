@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "logo_marketplace" "\0"
+            VALUE "FileDescription", "mobile_arnold" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "logo_marketplace" "\0"
+            VALUE "InternalName", "mobile_arnold" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "logo_marketplace.exe" "\0"
-            VALUE "ProductName", "logo_marketplace" "\0"
+            VALUE "OriginalFilename", "mobile_arnold.exe" "\0"
+            VALUE "ProductName", "mobile_arnold" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
