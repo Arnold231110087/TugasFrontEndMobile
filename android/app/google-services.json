@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "809081811301",
+    "project_id": "arjefojayasentosa",
+    "storage_bucket": "arjefojayasentosa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809081811301:android:6f08f38ff822007e92f18c",
+        "android_client_info": {
+          "package_name": "com.example.mobile_arnold"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD85_otUavTyK5FgoFqLphQcd9_fcm-C0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
