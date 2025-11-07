@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Perlu untuk error handling
 import '../../components/input_field_2_component.dart';
-import '../../services/database.dart';
+import '../../services/firebase.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -14,54 +14,65 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
+  final AuthService _authService = AuthService(); // Instance service
   bool _isLoading = false;
 
   Future<void> _registerUser(
       BuildContext context, String username, String email, String password) async {
+    
+    setState(() => _isLoading = true); // <-- 1. Loading DIMULAI
+
     try {
-      final db = DatabaseHelper();
+      // 1. Panggil service untuk register
+      await _authService.register(email, password, username);
 
-      final emailExists = await db.checkEmailExists(email);
-      if (emailExists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Email sudah terdaftar, gunakan email lain."),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      await db.insertUser({
-        'username': username,
-        'email': email,
-        'password': password,
-      });
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('email', email);
-      await prefs.setBool('isLoggedIn', true);
-
+      // --- PERBAIKAN (JIKA SUKSES) ---
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Akun berhasil dibuat!"),
+          content: Text("Akun berhasil dibuat! Silakan login."),
           backgroundColor: Colors.green,
         ),
       );
 
-      Navigator.pushReplacementNamed(context, '/login');
+      setState(() => _isLoading = false); // <-- 2. Loading DIHENTIKAN
+      Navigator.pushReplacementNamed(context, '/login'); // <-- 3. Baru Navigasi
+      // --- AKHIR PERBAIKAN ---
+
+    } on FirebaseAuthException catch (e) {
+      // --- PERBAIKAN (JIKA GAGAL) ---
+      setState(() => _isLoading = false); // <-- Loading DIHENTIKAN
+      // --- AKHIR PERBAIKAN ---
+
+      String message;
+      if (e.code == 'email-already-in-use') {
+        message = 'Email sudah terdaftar, gunakan email lain.';
+      } else if (e.code == 'weak-password') {
+        message = 'Kata sandi terlalu lemah (minimal 6 karakter).';
+      } else if (e.code == 'invalid-email') {
+        message = 'Format email tidak valid.';
+      } else {
+        message = e.message ?? 'Terjadi kesalahan.';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
     } catch (e) {
+      // --- PERBAIKAN (JIKA GAGAL) ---
+      setState(() => _isLoading = false); // <-- Loading DIHENTIKAN
+      // --- AKHIR PERBAIKAN ---
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Error: $e"),
           backgroundColor: Colors.red,
         ),
       );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -76,8 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
+    // --- (Seluruh kode UI Anda tidak berubah) ---
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -138,6 +148,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: _isLoading
                         ? null
                         : () async {
+                            // --- (Validasi Anda di sini sudah benar) ---
                             final username = usernameController.text.trim();
                             final email = emailController.text.trim();
                             final password = passwordController.text.trim();
@@ -156,7 +167,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               );
                               return;
                             }
-
                             if (username.length < 3) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -166,8 +176,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               );
                               return;
                             }
-
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                .hasMatch(email)) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Format email tidak valid'),
@@ -176,7 +186,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               );
                               return;
                             }
-
                             if (password.length < 6) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -186,7 +195,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               );
                               return;
                             }
-
                             if (password != confirmPassword) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -196,8 +204,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               );
                               return;
                             }
+                            // --- (Akhir Validasi) ---
 
-                            setState(() => _isLoading = true);
+                            // Panggil fungsi _registerUser yang sudah di-refactor
                             await _registerUser(context, username, email, password);
                           },
                     child: _isLoading
@@ -223,6 +232,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     side: const BorderSide(color: Colors.white),
                   ),
                   onPressed: () {
+                    // Cek jika sedang loading, jangan biarkan pop
+                    if (_isLoading) return;
                     Navigator.pop(context);
                   },
                   child: const Text('Masuk'),

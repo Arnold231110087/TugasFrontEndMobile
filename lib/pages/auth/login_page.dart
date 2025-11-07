@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Tetap perlu untuk error handling
 import '../../components/input_field_2_component.dart';
-import '../../services/database.dart';
+import '../../services/firebase.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,14 +14,17 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final DatabaseHelper db = DatabaseHelper();
+
+  final AuthService _authService = AuthService(); // Instance service
 
   bool _isLoading = false;
 
   Future<void> _login() async {
-    final theme = Theme.of(context);  
+    final theme = Theme.of(context);
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
+    
+    // --- Validasi Input ---
     final emailRegex =
         r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
 
@@ -28,52 +32,78 @@ class _LoginPageState extends State<LoginPage> {
       _showSnack('Email dan kata sandi tidak boleh kosong', theme);
       return;
     }
-
     if (email.length > 50) {
       _showSnack('Email terlalu panjang', theme);
       return;
     }
-
     if (!RegExp(emailRegex).hasMatch(email)) {
       _showSnack('Email tidak valid', theme);
       return;
     }
-
     if (password.length < 6) {
       _showSnack('Kata sandi minimal 6 karakter', theme);
       return;
     }
+    // --- Akhir Validasi ---
 
-    setState(() => _isLoading = true);
+    setState(() => _isLoading = true); // <-- 1. Loading DIMULAI
 
     try {
-      final user = await db.login(email, password);
+      // 1. Panggil service untuk login
+      UserCredential userCredential =
+          await _authService.signIn(email, password);
 
-      if (user != null) {
+      if (userCredential.user != null) {
+        final user = userCredential.user!;
+
+        // 2. Panggil service untuk ambil data user
+        final userData = await _authService.getUserData(user.uid);
+        String username = userData?['username'] ?? user.email!;
+
+        // 3. Simpan sesi
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('is_logged_in', true);
-        await prefs.setString('username', user['username']);
-        await prefs.setString('email', user['email']);
-        await prefs.setInt('id', user['id']);
+        await prefs.setString('username', username);
+        await prefs.setString('email', user.email!);
+        await prefs.setString('uid', user.uid); 
 
+        // --- INI PERBAIKANNYA (JIKA SUKSES) ---
+        setState(() => _isLoading = false); // <-- 4. Loading DIHENTIKAN
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/');
+        Navigator.pushReplacementNamed(context, '/'); // <-- 5. Baru Navigasi
+        // --- AKHIR PERBAIKAN ---
+
       } else {
-        final emailExists = await db.checkEmailExists(email);
-        if (!emailExists) {
-          _showSnack('Email belum terdaftar, silakan daftar dulu', theme);
-        } else {
-          _showSnack('Email atau kata sandi salah', theme);
-        }
+         // Handle jika user null (meskipun jarang terjadi)
+        setState(() => _isLoading = false); // <-- Hentikan loading
+        _showSnack('Gagal mendapatkan detail user', theme);
       }
+
+    } on FirebaseAuthException catch (e) {
+      // --- PERBAIKAN JIKA GAGAL ---
+      setState(() => _isLoading = false); // <-- Loading DIHENTIKAN
+      // --- AKHIR PERBAIKAN ---
+
+      String message;
+      if (e.code == 'user-not-found' || e.code == 'INVALID_LOGIN_CREDENTIALS') {
+        message = 'Email belum terdaftar atau kata sandi salah.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Kata sandi salah, silakan coba lagi.';
+      } else {
+        message = 'Email atau kata sandi salah.';
+      }
+      _showSnack(message, theme);
+
     } catch (e) {
+      // --- PERBAIKAN JIKA GAGAL ---
+      setState(() => _isLoading = false); // <-- Loading DIHENTIKAN
+      // --- AKHIR PERBAIKAN ---
       _showSnack('Terjadi kesalahan: $e', theme);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    } 
   }
 
   void _showSnack(String message, ThemeData theme) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -94,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // --- (Seluruh kode UI Anda tidak berubah) ---
     final theme = Theme.of(context);
 
     return WillPopScope(
@@ -124,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                       backgroundColor: Colors.white,
                       child: ClipOval(
                         child: Image.asset(
-                          "assets/images/logo.jpg",
+                          "assets/images/logo.jpg", // Pastikan path ini benar
                           width: 100,
                           fit: BoxFit.cover,
                         ),
@@ -169,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: _isLoading ? null : _login,
+                      onPressed: _isLoading ? null : _login, // Terhubung ke _login
                       child: _isLoading
                           ? const SizedBox(
                               height: 20,
