@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_arnold/services/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../components/input_field_1_component.dart';
-import '../services/firebase.dart'; // Sesuaikan path ini jika perlu
+import '../components/input_field_1_component.dart'; // Sesuaikan path
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -16,6 +16,7 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final AuthService _authService = AuthService(); // Instance service
 
+  // Controller diinisialisasi kosong
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
@@ -35,23 +36,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _loadProfileData() async {
     setState(() => _isLoading = true);
 
-    // 1. Dapatkan user dari Firebase Auth
     User? user = _authService.currentUser;
     if (user == null) {
       if (mounted) Navigator.of(context).pushReplacementNamed('/login');
       return;
     }
 
-    _uid = user.uid; // Simpan UID
-    emailController.text = user.email ?? 'Tidak ada email'; // Email dari Auth
+    _uid = user.uid; 
+    emailController.text = user.email ?? 'Tidak ada email'; 
 
-    // 2. Dapatkan data profil dari Firestore
     final userData = await _authService.getUserData(_uid);
     if (userData != null) {
       nameController.text = userData['username'] ?? '';
-      bioController.text = userData['bio'] ?? ''; // Asumsi Anda menyimpan 'bio'
+      bioController.text = userData['bio'] ?? ''; 
 
-      // 3. Muat tanggal lahir (jika ada)
       if (userData['dob'] != null && userData['dob'] is Timestamp) {
         _selectedDate = (userData['dob'] as Timestamp).toDate();
         dobController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
@@ -75,43 +73,46 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _saveProfile() async {
-    if (_uid.isEmpty) return; // Pastikan UID ada
+    if (_uid.isEmpty) return; 
     if (!mounted) return;
 
-    setState(() => _isSaving = true); // <-- 1. Loading DIMULAI
-    final theme = Theme.of(context);
+    setState(() => _isSaving = true); 
+    
+    // Validasi sederhana (opsional, tapi bagus)
+    final username = nameController.text.trim();
+    if (username.length < 3) {
+      _showSnack('Username minimal 3 karakter', Colors.red);
+      setState(() => _isSaving = false);
+      return;
+    }
 
     try {
-      // 1. Siapkan data untuk di-update di Firestore
       Map<String, dynamic> dataToUpdate = {
-        'username': nameController.text.trim(),
+        'username': username,
         'bio': bioController.text.trim(),
         if (_selectedDate != null) 'dob': Timestamp.fromDate(_selectedDate!),
       };
 
-      // 2. Panggil service untuk update Firestore
+      // Panggil service (versi sederhana)
       await _authService.updateUserProfileData(_uid, dataToUpdate);
 
-      // 3. Update SharedPreferences (cache lokal)
+      // Update SharedPreferences (cache lokal)
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', nameController.text.trim());
+      await prefs.setString('bio', bioController.text.trim());
 
-      // --- PERBAIKAN (JIKA SUKSES) ---
       _showSnack('Profil berhasil disimpan', Colors.green);
-      setState(() => _isSaving = false); // <-- 2. Loading DIHENTIKAN
+      setState(() => _isSaving = false); 
       
-      // Tunggu sebentar agar user bisa lihat snackbar, baru pop
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) Navigator.pop(context);
-      // --- AKHIR PERBAIKAN ---
 
     } catch (e) {
-      // --- PERBAIKAN (JIKA GAGAL) ---
+      // Error handling sederhana
       _showSnack('Gagal menyimpan profil: $e', Colors.red);
       if (mounted) {
-        setState(() => _isSaving = false); // <-- 3. Loading DIHENTIKAN
+        setState(() => _isSaving = false);
       }
-      // --- AKHIR PERBAIKAN ---
     }
   }
 
@@ -125,7 +126,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    FocusScope.of(context).requestFocus(FocusNode()); // Tutup keyboard
+    FocusScope.of(context).requestFocus(FocusNode()); 
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime(2000, 1, 1),
@@ -160,7 +161,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         ),
       ),
-      // Tampilkan loading indicator jika sedang memuat data awal
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -169,7 +169,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Container(
                   alignment: Alignment.center,
                   child: const CircleAvatar(
-                    backgroundImage: AssetImage('assets/images/profile1.png'), // Pastikan path benar
+                    backgroundImage: AssetImage('assets/images/profile1.png'), 
                     radius: 48,
                   ),
                 ),
@@ -199,7 +199,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 InputField1(
                   label: 'Email',
                   controller: emailController,
-                  readOnly: true, // Gunakan parameter opsional
+                  readOnly: true, 
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
@@ -225,7 +225,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(height: 40),
                 TextButton(
-                  // Hubungkan ke _isSaving
                   onPressed: _isSaving ? null : _saveProfile,
                   style: TextButton.styleFrom(
                     backgroundColor: theme.textTheme.headlineSmall!.color,
@@ -236,7 +235,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     minimumSize: const Size.fromHeight(48),
                   ),
-                  // Tampilkan loading di dalam tombol
                   child: _isSaving
                       ? const SizedBox(
                           height: 24,

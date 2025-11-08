@@ -59,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
         // 2. Panggil service untuk ambil data user
         final userData = await _authService.getUserData(user.uid);
         String username = userData?['username'] ?? user.email!;
+        String bio = userData?['bio'] ?? '';
 
         // 3. Simpan sesi
         final prefs = await SharedPreferences.getInstance();
@@ -66,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('username', username);
         await prefs.setString('email', user.email!);
         await prefs.setString('uid', user.uid); 
+        await prefs.setString('bio', bio);
 
         // --- INI PERBAIKANNYA (JIKA SUKSES) ---
         setState(() => _isLoading = false); // <-- 4. Loading DIHENTIKAN

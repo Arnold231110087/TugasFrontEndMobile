@@ -4,6 +4,7 @@ import 'package:mobile_arnold/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:path/path.dart';
 
 import 'providers/theme_provider.dart';
@@ -75,6 +76,7 @@ void main() async {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

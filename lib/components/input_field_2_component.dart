@@ -5,6 +5,7 @@ class InputField2 extends StatelessWidget {
   final String hint;
   final TextEditingController controller;
   final bool obscureText;
+  final bool autofocus;
 
   const InputField2({
     super.key,
@@ -12,6 +13,8 @@ class InputField2 extends StatelessWidget {
     required this.hint,
     required this.controller,
     this.obscureText = false,
+    this.autofocus = false,
+
   });
 
   @override
@@ -25,6 +28,7 @@ class InputField2 extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
+        autofocus: autofocus,
         obscureText: obscureText,
         cursorColor: Colors.white,
         style: TextStyle(color: Colors.white),
