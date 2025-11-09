@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Aturan untuk KOLEKSInya (untuk query)
+    match /users {
+      // Izinkan 'list' (query) HANYA JIKA user sudah login.
+      // Ini akan dipakai oleh 'CreateProfilePage' untuk cek username.
+      allow list: if request.auth != null;
+    }
+  
+    // Aturan untuk DOKUMEN spesifik
+    match /users/{userId} {
+      
+      // Izinkan 'create' (simpan profil baru) HANYA JIKA
+      // ID user yang login sama dengan ID dokumen yang dibuat.
+      allow create: if request.auth.uid == userId;
+      
+      // Izinkan 'read', 'update', 'delete' HANYA untuk data sendiri.
+      allow read, update, delete: if request.auth.uid == userId;
+    }
+  }
+}
