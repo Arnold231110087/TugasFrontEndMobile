@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_arnold/services/firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // <-- Pastikan ini ada
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 import '../providers/theme_provider.dart';
 import '../providers/post_provider.dart';
 import 'edit_profile_page.dart';
@@ -14,11 +14,17 @@ import 'policy_page.dart';
 import 'help_page.dart';
 import 'post_page.dart';
 import 'sales_page.dart';
+import 'chat_detail_page.dart'; // <-- Tambahkan ini
 import '../components/drawer_section_component.dart';
 import '../components/account_page_section_button_component.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({super.key});
+  final String? userId;
+
+  const AccountPage({
+    super.key,
+    this.userId, 
+  });
 
   @override
   State<AccountPage> createState() => _AccountPageState();
@@ -27,19 +33,32 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   int selectedTab = 0;
   
-  // State diubah: kita tidak lagi menyimpan username/bio
-  // Kita hanya perlu AuthService dan UID
   final AuthService _authService = AuthService();
   String? _uid;
+  bool _isMyProfile = false; 
+  bool _isFollowing = false; 
 
   @override
   void initState() {
     super.initState();
-    // Ambil UID user yang sedang login saat halaman dibuka
-    _uid = _authService.currentUser?.uid;
-  }
+    
+    // --- PERBAIKAN LOGIKA DI SINI ---
+    String? currentLoggedInUid = _authService.currentUser?.uid;
 
-  // Fungsi _loadUserData() sudah tidak diperlukan lagi
+    if (widget.userId == null || widget.userId == currentLoggedInUid) {
+      // Ini adalah profil SAYA jika:
+      // 1. Dibuka dari tab bar (widget.userId == null)
+      // 2. Dibuka dari search TAPI userId-nya == UID saya
+      _uid = currentLoggedInUid;
+      _isMyProfile = true;
+    } else {
+      // Ini adalah profil ORANG LAIN
+      _uid = widget.userId;
+      _isMyProfile = false;
+      // TODO: Tambahkan logika cek 'isFollowing'
+    }
+    // --- AKHIR PERBAIKAN ---
+  }
 
   // (List 'drawers', 'stats', 'sections' Anda tetap sama)
   final List<Map<String, dynamic>> drawers = [
@@ -77,12 +96,6 @@ class _AccountPageState extends State<AccountPage> {
     },
   ];
 
-  final Map<String, int> stats = {
-    'penjualan': 1,
-    'pengikut': 2,
-    'mengikuti': 3,
-  };
-
   final List<Map<String, dynamic>> sections = [
     {'icon': Icons.post_add, 'page': PostPage()},
     {'icon': Icons.sell, 'page': SalesPage()},
@@ -103,6 +116,15 @@ class _AccountPageState extends State<AccountPage> {
       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   }
+  
+  Map<String, dynamic> _getChatData(String name, String image) {
+    return {
+      'username': name,
+      'profileImage': image,
+      'messages': <Map<String, dynamic>>[], 
+    };
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -112,9 +134,9 @@ class _AccountPageState extends State<AccountPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: !_isMyProfile, 
         title: Text(
-          'PROFIL',
+          _isMyProfile ? 'PROFIL SAYA' : 'PROFIL DESAINER',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: theme.textTheme.displayLarge!.fontSize,
@@ -122,23 +144,24 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: Builder(
-              builder: (context) {
-                return IconButton(
-                  icon: const Icon(Icons.menu),
-                  color: theme.textTheme.displaySmall!.color,
-                  onPressed: () {
-                    Scaffold.of(context).openEndDrawer();
-                  },
-                );
-              },
+          if (_isMyProfile)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu),
+                    color: theme.textTheme.displaySmall!.color,
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
-      endDrawer: Drawer(
+      endDrawer: _isMyProfile ? Drawer(
         backgroundColor: theme.scaffoldBackgroundColor,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.zero),
@@ -188,46 +211,39 @@ class _AccountPageState extends State<AccountPage> {
               label: const Text('Keluar'),
               icon: const Icon(Icons.logout),
               onPressed: () async {
-                // konfirmasi dulu
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Konfirmasi'),
-                    content: const Text('Apakah kamu yakin ingin keluar dari akun ini?'),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
-                      TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Keluar')),
-                    ],
-                  ),
-                );
-                if (confirm == true) {
-                  _logout(context);
-                }
+                 final confirm = await showDialog<bool>(
+                   context: context,
+                   builder: (ctx) => AlertDialog(
+                     title: const Text('Konfirmasi'),
+                     content: const Text('Apakah kamu yakin ingin keluar dari akun ini?'),
+                     actions: [
+                       TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+                       TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Keluar')),
+                     ],
+                   ),
+                 );
+                 if (confirm == true) {
+                   _logout(context);
+                 }
               },
             ),
           ],
         ),
-      ),
-      // --- PERUBAHAN UTAMA ADA DI SINI ---
+      ) : null,
+      
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Bungkus UI Profil dengan StreamBuilder
             StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              // 1. Tentukan Stream: dengarkan data user berdasarkan UID
               stream: _uid != null ? _authService.getUserDataStream(_uid!) : null,
               builder: (context, snapshot) {
                 
-                // 2. Tampilkan loading spinner selagi data dimuat
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                    // Buat UI "skeleton" (loading palsu) agar tidak loncat
                     child: _ProfileHeaderLoadingSkeleton(), 
                   );
                 }
-
-                // 3. Tampilkan error jika ada
                 if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -235,12 +251,17 @@ class _AccountPageState extends State<AccountPage> {
                   );
                 }
 
-                // 4. Jika data berhasil didapat
-                final userData = snapshot.data!.data();
-                final String username = userData?['username'] ?? 'Pengguna';
-                final String bio = userData?['bio'] ?? 'Bio belum diatur';
+                final userData = snapshot.data!.data() ?? {};
+                final String username = userData['username'] ?? 'Pengguna';
+                final String bio = userData['bio'] ?? 'Bio belum diatur';
+                final String imageAsset = userData['profileImageUrl'] ?? 'assets/images/profile1.png';
+                
+                final Map<String, int> dynamicStats = {
+                  'penjualan': userData['salesCount'] ?? 0,
+                  'pengikut': userData['followerCount'] ?? 0,
+                  'mengikuti': userData['followingCount'] ?? 0,
+                };
 
-                // 5. Kembalikan UI Profil Anda dengan data dinamis
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                   child: Column(
@@ -249,9 +270,8 @@ class _AccountPageState extends State<AccountPage> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const CircleAvatar(
-                            backgroundImage:
-                                AssetImage('assets/images/profile1.png'),
+                          CircleAvatar(
+                            backgroundImage: AssetImage(imageAsset),
                             radius: 40,
                           ),
                           const SizedBox(width: 24),
@@ -260,7 +280,7 @@ class _AccountPageState extends State<AccountPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  username, // <-- Data dinamis dari Stream
+                                  username, 
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: theme.textTheme.bodyMedium!.fontSize,
@@ -269,26 +289,30 @@ class _AccountPageState extends State<AccountPage> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(height: 12),
+                                SizedBox(height: 12),
                                 Row(
                                   children: [
-                                    // ... (Stats Anda tetap sama) ...
-                                    ...stats.entries.expand<Widget>((entry) => [
-                                      Column(
-                                        children: [
-                                          Text(
-                                            entry.value.toString(),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: theme.textTheme.bodyMedium!.fontSize,
-                                              color: theme.textTheme.bodyMedium!.color,
+                                    ...dynamicStats.entries.expand<Widget>(
+                                      (entry) => [
+                                        Column(
+                                          children: [
+                                            Text(
+                                              entry.value.toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: theme.textTheme.bodyMedium!.fontSize,
+                                                color: theme.textTheme.bodyMedium!.color,
+                                              ),
                                             ),
-                                          ),
-                                          Text(entry.key, style: theme.textTheme.labelSmall),
-                                        ],
-                                      ),
-                                      const SizedBox(width: 32),
-                                    ]).toList()..removeLast(),
+                                            Text(
+                                              entry.key,
+                                              style: theme.textTheme.labelSmall,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(width: 32),
+                                      ],
+                                    ).toList()..removeLast(),
                                   ],
                                 ),
                               ],
@@ -298,52 +322,88 @@ class _AccountPageState extends State<AccountPage> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        // Jika bio tidak kosong, tambahkan tanda kutip.
-                        // Jika kosong, tampilkan placeholder.
-                        bio.isNotEmpty ? bio : 'Bio belum diatur',
-                        
+                        bio.isNotEmpty ? '"$bio"' : 'Bio belum diatur.', 
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          // Tambahkan style miring untuk memperjelas
                           fontStyle: bio.isNotEmpty ? FontStyle.italic : FontStyle.normal,
-                          
-                          // Buat warna placeholder sedikit pudar agar tidak terlalu menonjol
                           color: bio.isNotEmpty
                               ? theme.textTheme.bodyMedium!.color
                               : theme.textTheme.bodySmall!.color,
                         ),
-                        textAlign: TextAlign.start,
                       ),
+                      
+                      if (!_isMyProfile)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    setState(() => _isFollowing = !_isFollowing);
+                                  },
+                                  icon: Icon(_isFollowing ? Icons.check : Icons.person_add_alt_1),
+                                  label: Text(_isFollowing ? 'Diikuti' : 'Ikuti'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _isFollowing ? theme.cardColor : theme.primaryColor,
+                                    foregroundColor: _isFollowing ? theme.textTheme.bodyMedium!.color : theme.colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatDetailPage(
+                                          chat: _getChatData(username, imageAsset),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  icon: Icon(Icons.chat_bubble_outline),
+                                  label: Text('Pesan'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: theme.primaryColor,
+                                    side: BorderSide(color: theme.primaryColor),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 );
               },
             ),
-            // --- AKHIR BAGIAN YANG DIPERBARUI ---
+            
+            if (_isMyProfile) ...[
+              Row(
+                children: [
+                  ...sections.asMap().entries.map((entry) {
+                    final int index = entry.key;
+                    final Map<String, dynamic> section = entry.value;
 
-            // Bagian Tab (Post/Sales) tetap sama
-            Row(
-              children: [
-                ...sections.asMap().entries.map((entry) {
-                  final int index = entry.key;
-                  final Map<String, dynamic> section = entry.value;
-
-                  return AccountPageSectionButton(
-                    icon: section['icon'],
-                    isActive: selectedTab == index,
-                    onPressed: () {
-                      setState(() {
-                        selectedTab = index;
-                      });
-                    },
-                  );
-                }),
-              ],
-            ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: sections[selectedTab]['page'],
-            ),
+                    return AccountPageSectionButton(
+                      icon: section['icon'],
+                      isActive: selectedTab == index,
+                      onPressed: () {
+                        setState(() {
+                          selectedTab = index;
+                        });
+                      },
+                    );
+                  }),
+                ],
+              ),
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                child: sections[selectedTab]['page'],
+              ),
+            ]
           ],
         ),
       ),
@@ -351,14 +411,11 @@ class _AccountPageState extends State<AccountPage> {
   }
 }
 
-// Widget internal untuk menampilkan loading yang cantik (opsional tapi disarankan)
 class _ProfileHeaderLoadingSkeleton extends StatelessWidget {
   const _ProfileHeaderLoadingSkeleton();
 
   @override
   Widget build(BuildContext context) {
-    // Anda bisa membuat ini lebih bagus dengan package 'shimmer'
-    // Tapi untuk sekarang, CircularProgressIndicator sudah cukup
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(32.0),

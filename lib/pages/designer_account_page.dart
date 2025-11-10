@@ -1,337 +1,307 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/theme_provider.dart';
-import 'sales_page.dart';
-import '../components/account_page_section_button_component.dart';
-import 'chat_detail_page.dart';
+// import 'package:flutter/material.dart';
+// import 'package:mobile_arnold/services/firebase.dart';
+// import 'package:provider/provider.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart'; // <-- Tambahkan
+// import '../providers/theme_provider.dart';
+// import 'sales_page.dart';
+// import '../components/account_page_section_button_component.dart';
+// import 'chat_detail_page.dart';
 
-class DesignerAccountPage extends StatefulWidget {
-  final String designerName;
-  final String imageAsset;
-  final String sales;
-  final double rating;
-  final String followers;
+// class DesignerAccountPage extends StatefulWidget {
+//   // --- 1. HANYA PERLU 'userId' ---
+//   final String userId;
 
-  const DesignerAccountPage({
-    super.key,
-    required this.designerName,
-    required this.imageAsset,
-    required this.sales,
-    required this.rating,
-    required this.followers,
-  });
+//   const DesignerAccountPage({
+//     super.key,
+//     required this.userId, // <-- Terima 'userId' dari hasil pencarian
+//   });
+//   // --- AKHIR PERUBAHAN ---
 
-  @override
-  State<DesignerAccountPage> createState() => _DesignerAccountPageState();
-}
+//   @override
+//   State<DesignerAccountPage> createState() => _DesignerAccountPageState();
+// }
 
-class _DesignerAccountPageState extends State<DesignerAccountPage> {
-  int selectedTab = 0;
-  bool _isFollowing = false;
+// class _DesignerAccountPageState extends State<DesignerAccountPage> {
+//   int selectedTab = 0;
+//   bool _isFollowing = false; // Logika 'follow' tetap (meski belum fungsional)
+  
+//   // --- 2. TAMBAHKAN AuthService ---
+//   final AuthService _authService = AuthService();
+//   // --- AKHIR PERUBAHAN ---
 
-  final List<Map<String, dynamic>> sections = [
-    {'icon': Icons.post_add, 'title': 'Postingan', 'page': null},
-    {'icon': Icons.sell, 'title': 'Penjualan', 'page': SalesPage()},
-  ];
+//   final List<Map<String, dynamic>> sections = [
+//     {'icon': Icons.post_add, 'title': 'Postingan', 'page': null},
+//     {'icon': Icons.sell, 'title': 'Penjualan', 'page': SalesPage()},
+//   ];
 
-  Map<String, dynamic> _getChatDataForDesigner() {
-    return {
-      'username': widget.designerName,
-      'profileImage': widget.imageAsset,
-      'messages': <Map<String, dynamic>>[], 
-    };
-  }
+//   Map<String, dynamic> _getChatDataForDesigner(String name, String image) {
+//     return {
+//       'username': name,
+//       'profileImage': image,
+//       'messages': <Map<String, dynamic>>[], 
+//     };
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final ThemeData theme = Theme.of(context);
+//   @override
+//   Widget build(BuildContext context) {
+//     final themeProvider = Provider.of<ThemeProvider>(context);
+//     final ThemeData theme = Theme.of(context);
+    
+//     // Hapus parsing 'stats' yang lama
 
-    final double salesNumber =
-        double.tryParse(widget.sales.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
-    final double followersNumber =
-        double.tryParse(widget.followers.replaceAll(RegExp(r'[^0-9.]'), '')) ??
-        0.0;
+//     return Scaffold(
+//       backgroundColor: theme.scaffoldBackgroundColor,
+//       // --- 3. BUNGKUS 'SingleChildScrollView' DENGAN 'StreamBuilder' ---
+//       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+//         // Ambil data user desainer berdasarkan 'widget.userId'
+//         stream: _authService.getUserDataStream(widget.userId),
+//         builder: (context, snapshot) {
+          
+//           // Tampilkan loading
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return Scaffold(
+//               appBar: AppBar(
+//                 title: Text(
+//                   'Memuat Profil...',
+//                   style: TextStyle(
+//                     fontWeight: FontWeight.bold,
+//                     fontSize: theme.textTheme.displayLarge!.fontSize,
+//                     color: theme.textTheme.displayLarge!.color,
+//                   ),
+//                 ),
+//               ),
+//               body: const Center(child: CircularProgressIndicator()),
+//             );
+//           }
+          
+//           // Tampilkan error
+//           if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+//             return Scaffold(
+//               appBar: AppBar(title: const Text("Error")),
+//               body: const Center(child: Text('Gagal memuat profil desainer')),
+//             );
+//           }
+          
+//           // --- 4. AMBIL DATA DINAMIS DARI SNAPSHOT ---
+//           final userData = snapshot.data!.data() ?? {};
+//           final String designerName = userData['username'] ?? 'Desainer';
+//           final String bio = userData['bio'] ?? 'Bio belum diatur.';
+//           // Asumsi Anda menyimpan URL gambar di 'profileImageUrl'
+//           // Jika tidak, ganti 'assets/images/profile1.png'
+//           final String imageAsset = userData['profileImageUrl'] ?? 'assets/images/profile1.png'; 
+          
+//           // Ambil stats (pastikan nama field ini ada di Firestore Anda)
+//           final Map<String, double> stats = {
+//             'penjualan': (userData['salesCount'] ?? 0).toDouble(),
+//             'pengikut': (userData['followerCount'] ?? 0).toDouble(),
+//             'mengikuti': (userData['followingCount'] ?? 0).toDouble(),
+//           };
+//           // --- AKHIR PERUBAHAN ---
 
-    final Map<String, double> stats = {
-      'penjualan': salesNumber,
-      'pengikut': followersNumber,
-      'mengikuti': 0.0,
-    };
+//           // --- 5. KEMBALIKAN UI DENGAN DATA DINAMIS ---
+//           return Scaffold(
+//             appBar: AppBar(
+//               title: Text(
+//                 designerName.toUpperCase(), // <-- Data dinamis
+//                 style: TextStyle(
+//                   fontWeight: FontWeight.bold,
+//                   fontSize: theme.textTheme.displayLarge!.fontSize,
+//                   color: theme.textTheme.displayLarge!.color,
+//                 ),
+//               ),
+//             ),
+//             body: SingleChildScrollView(
+//               child: Column(
+//                 children: [
+//                   Padding(
+//                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         Row(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             CircleAvatar(
+//                               backgroundImage: AssetImage(imageAsset), // <-- Data dinamis
+//                               radius: 40,
+//                             ),
+//                             const SizedBox(width: 24),
+//                             Expanded(
+//                               child: Column(
+//                                 crossAxisAlignment: CrossAxisAlignment.start,
+//                                 children: [
+//                                   Text(
+//                                     designerName, // <-- Data dinamis
+//                                     style: TextStyle(
+//                                       fontWeight: FontWeight.bold,
+//                                       fontSize: theme.textTheme.bodyMedium!.fontSize,
+//                                       color: theme.textTheme.bodyMedium!.color,
+//                                     ),
+//                                   ),
+//                                   SizedBox(height: 12),
+//                                   Row(
+//                                     children: [
+//                                       ...stats.entries.expand<Widget>(
+//                                         (entry) => [
+//                                           Column(
+//                                             children: [
+//                                               Text(
+//                                                 entry.value.toStringAsFixed(0), // <-- Data dinamis
+//                                                 style: TextStyle(
+//                                                   fontWeight: FontWeight.bold,
+//                                                   fontSize: theme.textTheme.bodyMedium!.fontSize,
+//                                                   color: theme.textTheme.bodyMedium!.color,
+//                                                 ),
+//                                               ),
+//                                               Text(
+//                                                 entry.key,
+//                                                 style: theme.textTheme.labelSmall,
+//                                               ),
+//                                             ],
+//                                           ),
+//                                           const SizedBox(width: 32),
+//                                         ],
+//                                       ).toList()..removeLast(),
+//                                     ],
+//                                   ),
+//                                 ],
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                         SizedBox(height: 20),
+//                         Text(
+//                           bio.isNotEmpty ? '"$bio"' : 'Bio belum diatur.', // <-- Data dinamis
+//                           style: theme.textTheme.bodyMedium?.copyWith(
+//                             fontStyle: bio.isNotEmpty ? FontStyle.italic : FontStyle.normal,
+//                             color: bio.isNotEmpty
+//                                 ? theme.textTheme.bodyMedium!.color
+//                                 : theme.textTheme.bodySmall!.color,
+//                           ),
+//                         ),
+//                         SizedBox(height: 20),
+//                         Row(
+//                           children: [
+//                             Expanded(
+//                               child: ElevatedButton.icon(
+//                                 onPressed: () {
+//                                   // TODO: Tambahkan logika follow/unfollow ke Firebase
+//                                   setState(() => _isFollowing = !_isFollowing);
+//                                 },
+//                                 icon: Icon(
+//                                   _isFollowing ? Icons.check : Icons.person_add_alt_1,
+//                                 ),
+//                                 label: Text(_isFollowing ? 'Diikuti' : 'Ikuti'),
+//                                 style: ElevatedButton.styleFrom(
+//                                   backgroundColor: _isFollowing ? theme.cardColor : theme.primaryColor,
+//                                   foregroundColor: _isFollowing ? theme.textTheme.bodyMedium!.color : theme.colorScheme.onPrimary,
+//                                   padding: EdgeInsets.symmetric(
+//                                     horizontal: 20,
+//                                     vertical: 12,
+//                                   ),
+//                                   shape: RoundedRectangleBorder(
+//                                     borderRadius: BorderRadius.circular(8),
+//                                     side:
+//                                         _isFollowing
+//                                             ? BorderSide(color: theme.dividerColor)
+//                                             : BorderSide.none,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                             SizedBox(width: 8),
+//                             Expanded(
+//                               child: OutlinedButton.icon(
+//                                 onPressed: () {
+//                                   Navigator.push(
+//                                     context,
+//                                     MaterialPageRoute(
+//                                       builder: (context) => ChatDetailPage(
+//                                         chat: _getChatDataForDesigner(designerName, imageAsset), // <-- Data dinamis
+//                                       ),
+//                                     ),
+//                                   );
+//                                 },
+//                                 icon: Icon(Icons.chat_bubble_outline),
+//                                 label: Text('Pesan'),
+//                                 style: OutlinedButton.styleFrom(
+//                                   foregroundColor: theme.primaryColor,
+//                                   side: BorderSide(color: theme.primaryColor),
+//                                   padding: EdgeInsets.symmetric(
+//                                     horizontal: 20,
+//                                     vertical: 12,
+//                                   ),
+//                                   shape: RoundedRectangleBorder(
+//                                     borderRadius: BorderRadius.circular(8),
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                   Row(
+//                     children: [
+//                       ...sections.asMap().entries.map((entry) {
+//                         final int index = entry.key;
+//                         final Map<String, dynamic> section = entry.value;
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          widget.designerName.toUpperCase(),
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: theme.textTheme.displayLarge!.fontSize,
-            color: theme.textTheme.displayLarge!.color,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: AssetImage(widget.imageAsset),
-                        radius: 40,
-                      ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.designerName,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: theme.textTheme.bodyMedium!.fontSize,
-                                color: theme.textTheme.bodyMedium!.color,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            Row(
-                              children: [
-                                ...stats.entries
-                                    .expand<Widget>(
-                                      (entry) => [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              entry.value.toStringAsFixed(0),
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize:
-                                                    theme
-                                                        .textTheme
-                                                        .bodyMedium!
-                                                        .fontSize,
-                                                color:
-                                                    theme
-                                                        .textTheme
-                                                        .bodyMedium!
-                                                        .color,
-                                              ),
-                                            ),
-                                            Text(
-                                              entry.key,
-                                              style: theme.textTheme.labelSmall,
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 32),
-                                      ],
-                                    )
-                                    .toList()
-                                  ..removeLast(),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'A student trying to become a designer',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            if (_isFollowing) {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Berhenti mengikuti?'),
-                                    content: Text(
-                                      'Apakah Anda yakin ingin berhenti mengikuti ${widget.designerName}?',
-                                    ),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: Text(
-                                          'Batal',
-                                          style: TextStyle(
-                                            color:
-                                                theme
-                                                    .textTheme
-                                                    .bodyMedium!
-                                                    .color,
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text(
-                                          'Ya',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            _isFollowing = false;
-                                          });
-                                          Navigator.of(context).pop();
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Anda berhenti mengikuti ${widget.designerName}',
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            } else {
-                              setState(() {
-                                _isFollowing = true;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Anda mengikuti ${widget.designerName}',
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                          icon: Icon(
-                            _isFollowing ? Icons.check : Icons.person_add_alt_1,
-                          ),
-                          label: Text(_isFollowing ? 'Diikuti' : 'Ikuti'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                _isFollowing
-                                    ? theme.cardColor
-                                    : theme.primaryColor,
-                            foregroundColor:
-                                _isFollowing
-                                    ? theme.textTheme.bodyMedium!.color
-                                    : theme.colorScheme.onPrimary,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              side:
-                                  _isFollowing
-                                      ? BorderSide(color: theme.dividerColor)
-                                      : BorderSide.none,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => ChatDetailPage(
-                                      chat: _getChatDataForDesigner(),
-                                    ),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.chat_bubble_outline),
-                          label: Text('Pesan'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.primaryColor,
-                            side: BorderSide(color: theme.primaryColor),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              children: [
-                ...sections.asMap().entries.map((entry) {
-                  final int index = entry.key;
-                  final Map<String, dynamic> section = entry.value;
-
-                  return AccountPageSectionButton(
-                    icon: section['icon'],
-                    isActive: selectedTab == index,
-                    onPressed: () {
-                      setState(() {
-                        selectedTab = index;
-                      });
-                    },
-                  );
-                }),
-              ],
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-              child: Builder(
-                builder: (context) {
-                  if (selectedTab == 0) {
-                    return Center(
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.image_not_supported_outlined,
-                            size: 60,
-                            color: theme.colorScheme.onSurface.withOpacity(0.4),
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Belum ada postingan dari desainer ini.',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(
-                                0.6,
-                              ),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 200),
-                        ],
-                      ),
-                    );
-                  } else if (selectedTab == 1) {
-                    return sections[selectedTab]['page'];
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//                         return AccountPageSectionButton(
+//                           icon: section['icon'],
+//                           isActive: selectedTab == index,
+//                           onPressed: () {
+//                             setState(() {
+//                               selectedTab = index;
+//                             });
+//                           },
+//                         );
+//                       }),
+//                     ],
+//                   ),
+//                   Divider(),
+//                   Padding(
+//                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+//                     child: Builder(
+//                       builder: (context) {
+//                         if (selectedTab == 0) {
+//                           return Center(
+//                             child: Column(
+//                               children: [
+//                                 Icon(
+//                                   Icons.image_not_supported_outlined,
+//                                   size: 60,
+//                                   color: theme.colorScheme.onSurface.withOpacity(0.4),
+//                                 ),
+//                                 SizedBox(height: 16),
+//                                 Text(
+//                                   'Belum ada postingan dari desainer ini.',
+//                                   style: theme.textTheme.titleMedium?.copyWith(
+//                                     color: theme.colorScheme.onSurface.withOpacity(
+//                                       0.6,
+//                                     ),
+//                                   ),
+//                                   textAlign: TextAlign.center,
+//                                 ),
+//                                 SizedBox(height: 200),
+//                               ],
+//                             ),
+//                           );
+//                         } else if (selectedTab == 1) {
+//                           return sections[selectedTab]['page'];
+//                         }
+//                         return SizedBox.shrink();
+//                       },
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           );
+//           // --- AKHIR UI ---
+//         },
+//       ),
+//     );
+//   }
+// }

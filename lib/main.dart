@@ -2,10 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_arnold/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+// 'database.dart' tidak diperlukan di sini jika Anda tidak menggunakannya
+// import 'package:shared_preferences/shared_preferences.dart'; 
+// import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:path/path.dart';
+// import 'package:path/path.dart';
 
 import 'providers/theme_provider.dart';
 import 'providers/post_provider.dart';
@@ -15,6 +16,8 @@ import 'screens/onboarding_screen.dart';
 import 'pages/auth/login_page.dart';
 import 'pages/auth/register_page.dart';
 import 'pages/auth/forgot_password_page.dart';
+// Import halaman baru untuk alur 2 langkah
+import 'pages/auth/create_profile_page.dart'; 
 import 'pages/home_page.dart';
 import 'pages/search_page.dart';
 import 'pages/upload_page.dart';
@@ -25,13 +28,21 @@ import 'pages/account_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
+  // Inisialisasi FFI untuk SQFlite (jika Anda menggunakannya di desktop)
+  // sqfliteFfiInit(); 
+  // databaseFactory = databaseFactoryFfi;
+  
+  // Inisialisasi untuk format tanggal (PENTING)
   await initializeDateFormatting('id_ID', null);
+  
+  // Inisialisasi Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await deleteDatabase(join(await getDatabasesPath(), 'history.db'));
+  
+  // Hapus 'deleteDatabase' kecuali Anda benar-benar ingin menghapusnya setiap kali
+  // await deleteDatabase(join(await getDatabasesPath(), 'history.db'));
+  
   runApp(
     MultiProvider(
       providers: [
@@ -52,6 +63,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'LogoDesain',
       debugShowCheckedModeBanner: false,
+      
+      // --- TEMA TERANG (LIGHT THEME) ---
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: const Color(0xFFFFFFFF),
         cardColor: const Color(0xFFF9FAFB),
@@ -82,6 +95,8 @@ class MyApp extends StatelessWidget {
           labelSmall: TextStyle(color: Color(0xFF7A7A7A), fontSize: 12),
         ),
       ),
+      
+      // --- TEMA GELAP (DARK THEME) ---
       darkTheme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF121212),
         cardColor: const Color(0xFF1A1A1A),
@@ -97,6 +112,7 @@ class MyApp extends StatelessWidget {
         dialogTheme: const DialogThemeData(
           backgroundColor: Color(0xFF121212),
         ),
+        // --- DUPLIKASI DIHAPUS ---
         textTheme: const TextTheme(
           displayLarge: TextStyle(color: Color(0xFFE0E0E0), fontSize: 18),
           displayMedium: TextStyle(color: Color(0xFFE0E0E0), fontSize: 14),
@@ -112,41 +128,52 @@ class MyApp extends StatelessWidget {
           labelSmall: TextStyle(color: Color(0xFF8A8A8A), fontSize: 12),
         ),
       ),
+      
       themeMode: themeProvider.themeMode,
       initialRoute: '/splash',
+      
+      // --- RUTE DIPERBARUI ---
       routes: {
         '/': (context) => const MainNavigation(),
         '/splash': (context) => const SplashScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
+        // Tambahkan rute untuk alur 2 langkah
+        // '/create-profile': (context) => const CreateProfilePage(), 
         '/forgot-password': (context) => ForgotPasswordPage(),
       },
     );
   }
 }
 
+// --- NAVIGASI BAWAH DIPERBARUI ---
+
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
   @override
-  State<MainNavigation> createState() => _MainNavigationState();
+  // Ubah menjadi 'MainNavigationState' (Publik)
+  State<MainNavigation> createState() => MainNavigationState();
 }
 
-class _MainNavigationState extends State<MainNavigation> {
-  int _selectedIndex = 0;
+// Ubah menjadi 'MainNavigationState' (Publik)
+class MainNavigationState extends State<MainNavigation> {
+  // Ubah menjadi 'selectedIndex' (Publik)
+  int selectedIndex = 0;
 
   final List<Widget> _pages = [
     HomePage(),
     SearchPage(),
     UploadPage(),
     NotificationPage(),
-    AccountPage(),
+    AccountPage(), // Ini akan menjadi profil Anda (userId: null)
   ];
 
-  void _onItemTapped(int index) {
+  // Ubah menjadi 'onItemTapped' (Publik)
+  void onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      selectedIndex = index;
     });
   }
 
@@ -155,10 +182,10 @@ class _MainNavigationState extends State<MainNavigation> {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: _pages[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: selectedIndex,
+        onTap: onItemTapped,
         selectedItemColor: theme.textTheme.headlineSmall!.color,
         unselectedItemColor: theme.textTheme.labelSmall!.color,
         showSelectedLabels: false,
@@ -185,6 +212,7 @@ class _MainNavigationState extends State<MainNavigation> {
             label: 'Notifikasi',
             tooltip: 'Notifikasi',
           ),
+          // --- 'TYPO' DIHAPUS DARI SINI ---
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Akun',
@@ -195,4 +223,3 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 }
-

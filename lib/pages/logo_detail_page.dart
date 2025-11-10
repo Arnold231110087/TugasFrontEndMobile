@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../pages/designer_account_page.dart';
+import '../pages/account_page.dart';
 
 class LogoDetailPage extends StatelessWidget {
   final String name;
@@ -95,12 +95,12 @@ class LogoDetailPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => DesignerAccountPage(
-                      designerName: randomDesigner['designerName'],
-                      imageAsset: randomDesigner['imageAsset'],
-                      sales: randomDesigner['sales'],
-                      rating: randomDesigner['rating'],
-                      followers: randomDesigner['followers'],
+                    builder: (_) => AccountPage(
+                      // designerName: randomDesigner['designerName'],
+                      // imageAsset: randomDesigner['imageAsset'],
+                      // sales: randomDesigner['sales'],
+                      // rating: randomDesigner['rating'],
+                      // followers: randomDesigner['followers'],
                     ),
                   ),
                 );

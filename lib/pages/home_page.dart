@@ -5,7 +5,7 @@ import 'post_follow_page.dart';
 import '../components/best_designer_card_component.dart';
 import '../components/post_card_component.dart';
 import '../components/transaction_card_component.dart';
-import 'designer_account_page.dart'; 
+import 'account_page.dart'; 
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -111,12 +111,12 @@ class HomePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DesignerAccountPage(
-                                designerName: 'Richardo Lieberio',
-                                imageAsset: 'assets/images/profile1.png',
-                                sales: '17 Penjualan',
-                                rating: 5.0,
-                                followers: '198 Pengikut',
+                              builder: (context) => AccountPage(
+                                // designerName: 'Richardo Lieberio',
+                                // imageAsset: 'assets/images/profile1.png',
+                                // sales: '17 Penjualan',
+                                // rating: 5.0,
+                                // followers: '198 Pengikut',
                               ),
                             ),
                           );
@@ -133,12 +133,12 @@ class HomePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DesignerAccountPage(
-                                designerName: 'Jessica Bui',
-                                imageAsset: 'assets/images/profile2.png',
-                                sales: '10 Penjualan',
-                                rating: 4.8,
-                                followers: '193 Pengikut',
+                              builder: (context) => AccountPage(
+                                // designerName: 'Jessica Bui',
+                                // imageAsset: 'assets/images/profile2.png',
+                                // sales: '10 Penjualan',
+                                // rating: 4.8,
+                                // followers: '193 Pengikut',
                               ),
                             ),
                           );
@@ -178,12 +178,12 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DesignerAccountPage(
-                          designerName: 'Kevin Durant',
-                          imageAsset: 'assets/images/profile3.png',
-                          sales: '15 Penjualan',
-                          rating: 5.0,
-                          followers: '150 Pengikut',
+                        builder: (context) => AccountPage(
+                          // designerName: 'Kevin Durant',
+                          // imageAsset: 'assets/images/profile3.png',
+                          // sales: '15 Penjualan',
+                          // rating: 5.0,
+                          // followers: '150 Pengikut',
                         ),
                       ),
                     );
@@ -199,12 +199,12 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DesignerAccountPage(
-                          designerName: 'Ahmad',
-                          imageAsset: 'assets/images/profile4.png',
-                          sales: '8 Penjualan',
-                          rating: 4.0,
-                          followers: '90 Pengikut',
+                        builder: (context) => AccountPage(
+                          // designerName: 'Ahmad',
+                          // imageAsset: 'assets/images/profile4.png',
+                          // sales: '8 Penjualan',
+                          // rating: 4.0,
+                          // followers: '90 Pengikut',
                         ),
                       ),
                     );

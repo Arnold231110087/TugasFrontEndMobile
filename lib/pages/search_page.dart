@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../components/search_account_component.dart';
-import 'logo_detail_page.dart';
-import '../services/logo_dev_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_arnold/services/firebase.dart'; 
+import '../components/search_account_component.dart'; // Komponen UI
+import 'logo_detail_page.dart'; // Halaman detail logo Anda
+import '../services/logo_dev_service.dart'; // Service logo Anda
+import 'account_page.dart'; // Halaman Akun untuk navigasi
+import '../main.dart'; // <-- Import main.dart
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -17,38 +21,35 @@ class _SearchPageState extends State<SearchPage>
   late TabController _tabController;
   Timer? _debounce;
 
+  // State untuk hasil pencarian Akun dari Firebase
   List<Map<String, dynamic>> _filteredAccounts = [];
   bool _isSearchingAccount = false;
   bool _noAccountResults = false;
 
+  // State untuk Riwayat Pencarian (data statis/lokal)
   final List<Map<String, dynamic>> _searchedAccounts = [
     {'name': 'Jessica Bui', 'followers': '193 pengikut', 'rating': 4.8},
     {'name': 'Richardo Lieberio', 'followers': '198 pengikut', 'isFriend': true, 'rating': 5.0},
-    {'name': 'Ahmad', 'followers': '3 pengikut', 'followsYou': true},
   ];
 
-  final List<Map<String, dynamic>> randomAccounts = [
-    {'name': 'Arnold Jefverson', 'followers': '1 pengikut', 'followsYou': true, 'rating': 4.0},
-    {'name': 'Christy Hung', 'followers': 'Tidak ada pengikut'},
-    {'name': 'Mamen Ganda', 'followers': '5 pengikut', 'rating': 4.5},
-    {'name': 'Bambang', 'followers': 'Tidak ada pengikut', 'isFriend': true},
-  ];
-
-  List<Map<String, dynamic>> get _allAccounts => [
-        ..._searchedAccounts,
-        ...randomAccounts,
-      ];
-
+  // State untuk pencarian Logo
   final LogoDevService _logoService = LogoDevService();
   List<Map<String, dynamic>> _logoResults = [];
   bool _isSearchingLogo = false;
   String _logoError = '';
+
+  // State untuk AuthService dan UID pengguna
+  final AuthService _authService = AuthService();
+  String? _myUid;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _searchController.addListener(_onSearchChanged);
+    
+    // Ambil UID pengguna yang sedang login
+    _myUid = _authService.currentUser?.uid;
   }
 
   @override
@@ -60,28 +61,26 @@ class _SearchPageState extends State<SearchPage>
     super.dispose();
   }
 
+  /// Dipanggil setiap kali teks di search bar berubah
   void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase();
+    final query = _searchController.text.toLowerCase(); 
 
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 400), () {
       if (_tabController.index == 0) {
-        setState(() {
-          if (query.isEmpty) {
+        // --- LOGIKA TAB AKUN ---
+        if (query.isEmpty) {
+          setState(() {
             _isSearchingAccount = false;
             _filteredAccounts.clear();
             _noAccountResults = false;
-          } else {
-            _isSearchingAccount = true;
-            _filteredAccounts = _allAccounts
-                .where((account) =>
-                    account['name'].toLowerCase().contains(query))
-                .toList();
-            _noAccountResults = _filteredAccounts.isEmpty;
-          }
-        });
+          });
+        } else {
+          _searchAccounts(query);
+        }
       } else {
+        // --- LOGIKA TAB LOGO ---
         if (query.isNotEmpty) {
           _searchLogos(query);
         } else {
@@ -94,6 +93,51 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
+  /// Fungsi untuk mencari akun di Firebase
+  // Di file lib/pages/search_page.dart
+
+  /// Fungsi untuk mencari akun di Firebase
+  Future<void> _searchAccounts(String query) async {
+    setState(() {
+      _isSearchingAccount = true; 
+      _noAccountResults = false;
+      _filteredAccounts.clear();
+    });
+
+    try {
+      // --- PERUBAHAN DI SINI ---
+      // Kita tidak lagi menggunakan 'isEqualTo'.
+      // Kita mencari 'username' yang "lebih besar dari atau sama dengan" query
+      // DAN "lebih kecil dari" query + karakter 'batas akhir' \uf8ff.
+      
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isGreaterThanOrEqualTo: query)
+          .where('username', isLessThan: query + '\uf8ff') // Karakter 'batas akhir'
+          .limit(10)
+          .get();
+      // --- AKHIR PERUBAHAN ---
+
+      List<Map<String, dynamic>> results = [];
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> userData = doc.data();
+        userData['uid'] = doc.id; // Simpan UID untuk navigasi
+        results.add(userData);
+      }
+
+      setState(() {
+        _filteredAccounts = results;
+        _noAccountResults = results.isEmpty;
+      });
+    } catch (e) {
+      print("Error saat mencari akun: $e");
+      setState(() {
+        _noAccountResults = true; 
+      });
+    }
+  }
+
+  /// Fungsi untuk mencari logo (dari service Anda)
   Future<void> _searchLogos(String query) async {
     setState(() {
       _isSearchingLogo = true;
@@ -117,6 +161,7 @@ class _SearchPageState extends State<SearchPage>
     }
   }
 
+  /// Fungsi untuk menghapus riwayat pencarian
   void _deleteSearchedAccount(int index) {
     setState(() {
       final String deletedName = _searchedAccounts[index]['name'];
@@ -130,74 +175,97 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
+  /// Membangun UI untuk tab "Akun"
   Widget _buildAccountTab(ThemeData theme) {
-    return _isSearchingAccount
-        ? _noAccountResults
-            ? _buildNoAccountFound(theme)
-            : ListView.builder(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                itemCount: _filteredAccounts.length,
-                itemBuilder: (context, index) {
-                  final account = _filteredAccounts[index];
-                  return SearchAccount(
-                    key: ValueKey(account['name']),
-                    name: account['name'],
-                    followers: account['followers'],
-                    followsYou: account['followsYou'] ?? false,
-                    isFriend: account['isFriend'] ?? false,
-                    rating: account['rating'],
-                  );
-                },
-              )
-        : ListView(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Akun yang pernah dicari',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: theme.textTheme.bodyMedium!.fontSize,
-                      color: theme.textTheme.bodyMedium!.color,
-                    ),
+    // Jika sedang mencari (query tidak kosong)
+    if (_isSearchingAccount) {
+      if (_noAccountResults) {
+        return _buildNoAccountFound(theme);
+      }
+      // Tampilkan hasil dari Firebase
+      return ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        itemCount: _filteredAccounts.length,
+        itemBuilder: (context, index) {
+          final account = _filteredAccounts[index];
+          
+          final String username = account['username'] ?? 'Nama tidak ada';
+          final String uid = account['uid'];
+          final String followers = (account['followerCount']?.toString() ?? '0') + ' pengikut';
+          final double? rating = (account['rating'] is num) ? (account['rating'] as num).toDouble() : null;
+
+          return SearchAccount(
+            key: ValueKey(uid), 
+            name: username,
+            followers: followers,
+            rating: rating,
+            followsYou: false, 
+            isFriend: false,   
+            onDelete: null, 
+            
+            // --- LOGIKA ONTAP PENTING ---
+            onTap: () {
+              if (uid == _myUid) {
+                // INI PROFIL SAYA
+                // Panggil method 'onItemTapped' dari parent (MainNavigation)
+                context.findAncestorStateOfType<MainNavigationState>()?.onItemTapped(4); // 4 = index Akun
+              } else {
+                // INI PROFIL ORANG LAIN
+                // Push halaman baru (tanpa bottom bar)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    // AccountPage akan menampilkan profil orang lain
+                    builder: (context) => AccountPage(userId: uid), 
                   ),
-                  Text('Lihat semua', style: theme.textTheme.headlineSmall),
-                ],
-              ),
-              const SizedBox(height: 12),
-              ...List.generate(_searchedAccounts.length, (index) {
-                final account = _searchedAccounts[index];
-                return SearchAccount(
-                  key: ValueKey(account['name']),
-                  name: account['name'],
-                  followers: account['followers'],
-                  followsYou: account['followsYou'] ?? false,
-                  isFriend: account['isFriend'] ?? false,
-                  rating: account['rating'],
-                  onDelete: () => _deleteSearchedAccount(index),
                 );
-              }),
-              const SizedBox(height: 36),
-              const Text('Akun acak',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              ...randomAccounts.map((account) {
-                return SearchAccount(
-                  key: ValueKey(account['name']),
-                  name: account['name'],
-                  followers: account['followers'],
-                  followsYou: account['followsYou'] ?? false,
-                  isFriend: account['isFriend'] ?? false,
-                  rating: account['rating'],
-                );
-              }),
-            ],
+              }
+            },
+            // --- AKHIR LOGIKA ONTAP ---
           );
+        },
+      );
+    }
+
+    // Jika tidak sedang mencari (query kosong), tampilkan riwayat
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      children: [
+        Row(
+           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+           children: [
+             Text(
+               'Akun yang pernah dicari',
+               style: TextStyle(
+                 fontWeight: FontWeight.bold,
+                 fontSize: theme.textTheme.bodyMedium!.fontSize,
+                 color: theme.textTheme.bodyMedium!.color,
+               ),
+             ),
+             Text('Lihat semua', style: theme.textTheme.headlineSmall),
+           ],
+        ),
+        const SizedBox(height: 12),
+        ...List.generate(_searchedAccounts.length, (index) {
+          final account = _searchedAccounts[index];
+          return SearchAccount(
+            key: ValueKey(account['name']),
+            name: account['name'],
+            followers: account['followers'],
+            followsYou: account['followsYou'] ?? false,
+            isFriend: account['isFriend'] ?? false,
+            rating: account['rating'],
+            onDelete: () => _deleteSearchedAccount(index),
+            onTap: () {
+              // TODO: Anda juga bisa buat navigasi dari riwayat jika punya UID
+            },
+          );
+        }),
+      ],
+    );
   }
 
+  /// Membangun UI untuk 'user tidak ditemukan'
   Widget _buildNoAccountFound(ThemeData theme) {
     return Center(
       child: Column(
@@ -223,6 +291,7 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
+  /// Membangun UI untuk tab "Logo"
   Widget _buildLogoTab(ThemeData theme) {
     return Column(
       children: [
@@ -280,6 +349,7 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
+  /// Build utama
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -318,10 +388,6 @@ class _SearchPageState extends State<SearchPage>
                                 color: theme.textTheme.bodySmall!.color),
                             onPressed: () {
                               _searchController.clear();
-                              setState(() {
-                                _filteredAccounts.clear();
-                                _logoResults.clear();
-                              });
                             },
                           )
                         : null,
@@ -331,7 +397,7 @@ class _SearchPageState extends State<SearchPage>
             },
           ),
         ),
-         bottom: TabBar(
+          bottom: TabBar(
           controller: _tabController,
           labelColor: theme.appBarTheme.foregroundColor,
           unselectedLabelColor: theme.textTheme.labelSmall?.color,
