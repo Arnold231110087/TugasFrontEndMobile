@@ -53,11 +53,11 @@ class AuthService {
     );
 
     User? user = userCredential.user;
-
+    final lowerUsername = username.toLowerCase();
     // 2. Simpan data tambahan ke Firestore
     if (user != null) {
       final userData = {
-        'username': username,
+        'username': lowerUsername,
         'email': email,
         'uid': user.uid,
         'bio': '',
@@ -176,5 +176,42 @@ class AuthService {
             DateTime.now().toIso8601String(),
       });
     }
+  }
+
+  Future<void> saveSearchHistoryToFirebase(String myUid, Map<String, dynamic> searchedUserData) async {
+    if (myUid == searchedUserData['uid']) return; // Jangan simpan riwayat cari diri sendiri
+    
+    await _firestore
+        .collection('users')
+        .doc(myUid)
+        .collection('search_history')
+        .doc(searchedUserData['uid']) // Gunakan UID hasil cari sbg ID
+        .set({
+          'username': searchedUserData['username'],
+          'searchedUid': searchedUserData['uid'],
+          'timestamp': FieldValue.serverTimestamp(),
+          // Anda bisa tambahkan data lain seperti 'profileImageUrl'
+        });
+  }
+
+  /// Menghapus satu item riwayat dari Firestore
+  Future<void> deleteSearchHistoryFromFirebase(String myUid, String searchedUid) async {
+     await _firestore
+        .collection('users')
+        .doc(myUid)
+        .collection('search_history')
+        .doc(searchedUid)
+        .delete();
+  }
+
+  /// Mengambil riwayat dari Firestore (untuk sinkronisasi saat login)
+  Stream<QuerySnapshot<Map<String, dynamic>>> getSearchHistoryStream(String myUid) {
+    return _firestore
+        .collection('users')
+        .doc(myUid)
+        .collection('search_history')
+        .orderBy('timestamp', descending: true)
+        .limit(10)
+        .snapshots();
   }
 }

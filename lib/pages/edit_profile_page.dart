@@ -88,7 +88,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     try {
       Map<String, dynamic> dataToUpdate = {
-        'username': username,
+        'username': username.toLowerCase(),
         'bio': bioController.text.trim(),
         if (_selectedDate != null) 'dob': Timestamp.fromDate(_selectedDate!),
       };
