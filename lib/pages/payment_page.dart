@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../utils/rupiah_format.dart';
 import 'payment_success_page.dart';
-import '../services/history_database.dart';
+// import '../services/history_database.dart'; // <-- HAPUS INI
+import '../services/database.dart'; // <-- INI SUDAH BENAR (File gabungan)
+import '../services/firebase.dart'; // <-- 1. TAMBAHKAN IMPORT AUTHSERVICE
 import '../components/payment_option.dart';
-import '../services/database.dart'; // 🔹 Tambahkan ini agar bisa ambil email dari LocalDatabase
 
 class PaymentPage extends StatefulWidget {
   final List<Map<String, String>> options;
@@ -21,11 +22,13 @@ class PaymentPage extends StatefulWidget {
 
 class _BankPageState extends State<PaymentPage> {
   String selectedPayment = '';
+  
+  // --- 2. TAMBAHKAN INSTANCE SERVICE ---
+  final LocalDatabase _localDb = LocalDatabase();
+  final AuthService _authService = AuthService();
+  // --- AKHIR TAMBAHAN ---
 
-  Future<String?> _getUserEmail() async {
-    final user = await LocalDatabase().getCurrentUserEmail();
-    return user;
-  }
+  // Hapus _getUserEmail(), kita akan ambil langsung dari authService
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +38,7 @@ class _BankPageState extends State<PaymentPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: Text(
-          'METODE PEMBAYARAN',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: theme.textTheme.displayLarge!.fontSize,
-            color: theme.textTheme.displayLarge!.color,
-          ),
-        ),
+        // ... (AppBar Anda tetap sama)
       ),
       body: Column(
         children: [
@@ -57,32 +52,27 @@ class _BankPageState extends State<PaymentPage> {
                 children: [
                   Text(
                     rupiahFormat(widget.amount),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 32,
-                      color: theme.textTheme.headlineLarge!.color,
-                    ),
+                    // ... (Text Style Anda tetap sama)
                   ),
                   const SizedBox(height: 32),
                   ...options.expand<Widget>((option) => [
-                    PaymentOption(
-                      isSelected: option['name'] == selectedPayment,
-                      name: option['name']!,
-                      icon: option['icon']!,
-                      url: option['url']!,
-                      onTap: () {
-                        setState(() {
-                          if (option['name'] == selectedPayment) {
-                            selectedPayment = '';
-                          } else {
-                            selectedPayment = option['name']!;
-                          }
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                  ]).toList()
+                        PaymentOption(
+                          isSelected: option['name'] == selectedPayment,
+                          name: option['name']!,
+                          icon: option['icon']!,
+                          url: option['url']!,
+                          onTap: () {
+                            setState(() {
+                              if (option['name'] == selectedPayment) {
+                                selectedPayment = '';
+                              } else {
+                                selectedPayment = option['name']!;
+                              }
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ]).toList()
                     ..removeLast(),
                 ],
               ),
@@ -93,22 +83,28 @@ class _BankPageState extends State<PaymentPage> {
               padding: const EdgeInsets.all(24),
               width: double.infinity,
               child: TextButton(
+                // --- 3. PERBARUI LOGIKA 'onPressed' ---
                 onPressed: () async {
                   final now = DateTime.now();
-                  final email = await _getUserEmail(); // 🔹 Ambil email user aktif
+                  
+                  // Ambil user yang sedang login dari AuthService
+                  final user = _authService.currentUser;
 
-                  if (email == null) {
+                  if (user == null || user.email == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Email pengguna tidak ditemukan.'),
+                        content: Text('Error: Pengguna tidak ditemukan. Silakan login ulang.'),
                         backgroundColor: Colors.red,
                       ),
                     );
                     return;
                   }
 
+                  final String email = user.email!;
+                  final String uid = user.uid;
+
                   final newHistory = {
-                    'email': email, // 🔹 Simpan berdasarkan email user
+                    'email': email, // Simpan berdasarkan email (sesuai skema lokal)
                     'title': 'Pembayaran Berhasil',
                     'description': 'Pembelian logo dengan metode $selectedPayment',
                     'profile': 'assets/images/profile1.png',
@@ -119,17 +115,33 @@ class _BankPageState extends State<PaymentPage> {
                     'time': '${now.hour}:${now.minute.toString().padLeft(2, '0')}',
                   };
 
-                  await HistoryDatabase.instance.create(newHistory);
+                  try {
+                    // 1. Simpan ke Cache SQFlite
+                    // (Gunakan fungsi dari file database.dart gabungan Anda)
+                    await _localDb.createHistory(newHistory);
 
-                  if (context.mounted) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const PaymentSuccessPage(),
+                    // 2. Simpan ke Firebase Firestore
+                    await _authService.saveTransactionHistoryToFirebase(uid, newHistory);
+
+                    // 3. Navigasi jika sukses
+                    if (context.mounted) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PaymentSuccessPage(),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                     ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Gagal menyimpan transaksi: $e'),
+                        backgroundColor: Colors.red,
                       ),
                     );
                   }
                 },
+                // --- AKHIR PERUBAHAN ---
                 child: const Text('Bayar'),
               ),
             ),

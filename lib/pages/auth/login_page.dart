@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_arnold/utils/string_format.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Tetap perlu untuk error handling
 import '../../components/input_field_2_component.dart';
@@ -58,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
 
         // 2. Panggil service untuk ambil data user
         final userData = await _authService.getUserData(user.uid);
-        String username = userData?['username'] ?? user.email!;
+        String username = userData?['username'].toString().toTitleCase() ?? user.email!;
         String bio = userData?['bio'] ?? '';
 
         // 3. Simpan sesi

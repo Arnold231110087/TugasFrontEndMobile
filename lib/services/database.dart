@@ -29,7 +29,7 @@ class LocalDatabase {
 
     return await openDatabase(
       path,
-      version: 3, // <-- 1. NAIKKAN VERSI KE 3
+      version: 4, // <-- 1. NAIKKAN VERSI KE 4
       onCreate: (db, version) async {
         // Ini berjalan untuk instalasi baru
         await db.execute('''
@@ -58,12 +58,26 @@ class LocalDatabase {
             timestamp INTEGER
           )
         ''');
+        
+        // --- 2. TAMBAHKAN TABEL 'history' (DARI 'HistoryDatabase') ---
+        await db.execute('''
+          CREATE TABLE history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            title TEXT,
+            description TEXT,
+            profile TEXT,
+            price INTEGER,
+            success INTEGER,
+            id_transaksi TEXT,
+            date TEXT,
+            time TEXT
+          )
+        ''');
       },
-      // --- 2. 'onUpgrade' SEKARANG AKTIF ---
       onUpgrade: (db, oldVersion, newVersion) async {
         // Ini berjalan untuk pengguna yang sudah ada
         if (oldVersion < 2) {
-          // Pengguna dari v1 akan mendapatkan 'session'
           await db.execute('''
             CREATE TABLE session (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,8 +86,6 @@ class LocalDatabase {
           ''');
         }
         
-        // --- 3. TAMBAHKAN BLOK 'if' BARU INI ---
-        // Pengguna dari v1 DAN v2 akan mendapatkan 'search_history'
         if (oldVersion < 3) {
           await db.execute('''
             CREATE TABLE search_history (
@@ -85,12 +97,31 @@ class LocalDatabase {
             )
           ''');
         }
+        
+        // --- 3. TAMBAHKAN LOGIKA UPGRADE UNTUK v4 ---
+        if (oldVersion < 4) {
+          await db.execute('''
+            CREATE TABLE history (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              email TEXT,
+              title TEXT,
+              description TEXT,
+              profile TEXT,
+              price INTEGER,
+              success INTEGER,
+              id_transaksi TEXT,
+              date TEXT,
+              time TEXT
+            )
+          ''');
+        }
         // --- AKHIR TAMBAHAN ---
       },
     );
   }
 
-  /// Simpan data user setelah login atau register dari Firebase
+  // --- FUNGSI UNTUK TABEL 'users' ---
+  
   Future<void> saveUser(Map<String, dynamic> userData) async {
     final db = await database;
     await db.insert(
@@ -100,7 +131,6 @@ class LocalDatabase {
     );
   }
 
-  /// Ambil data user berdasarkan UID (digunakan oleh AuthService)
   Future<Map<String, dynamic>?> getUserByUid(String uid) async {
     final db = await database;
     final result = await db.query(
@@ -109,16 +139,6 @@ class LocalDatabase {
       whereArgs: [uid],
     );
     if (result.isNotEmpty) return result.first;
-    return null;
-  }
-
-  /// Ambil email user yang sedang login
-  Future<String?> getCurrentUserEmail() async {
-    final db = await database;
-    final result = await db.query('users', limit: 1);
-    if (result.isNotEmpty) {
-      return result.first['email'] as String?;
-    }
     return null;
   }
 
@@ -136,9 +156,8 @@ class LocalDatabase {
     await db.delete('users');
   }
 
-  // --- FUNGSI-FUNGSI BARU UNTUK RIWAYAT PENCARIAN ---
+  // --- FUNGSI UNTUK TABEL 'search_history' ---
 
-  /// Mengambil riwayat pencarian lokal dari SQFlite
   Future<List<Map<String, dynamic>>> getSearchHistory(String uid) async {
     final db = await database;
     return await db.query(
@@ -146,11 +165,10 @@ class LocalDatabase {
       where: 'userId = ?',
       whereArgs: [uid],
       orderBy: 'timestamp DESC',
-      limit: 5, // Ambil 5 terakhir
+      limit: 5,
     );
   }
 
-  /// Menyimpan satu item riwayat pencarian ke SQFlite
   Future<void> addSearchHistory(Map<String, dynamic> historyItem) async {
     final db = await database;
     await db.delete(
@@ -165,7 +183,6 @@ class LocalDatabase {
     );
   }
 
-  /// Menghapus satu item riwayat dari SQFlite
   Future<void> deleteSearchHistory(String uid, String searchedUid) async {
     final db = await database;
     await db.delete(
@@ -175,13 +192,49 @@ class LocalDatabase {
     );
   }
 
-  /// Menghapus semua riwayat lokal untuk user
   Future<void> clearSearchHistory(String uid) async {
     final db = await database;
     await db.delete(
       'search_history',
       where: 'userId = ?',
       whereArgs: [uid],
+    );
+  }
+
+  // --- 4. FUNGSI BARU DARI 'HistoryDatabase' (UNTUK TABEL 'history') ---
+
+  /// Membuat data transaksi baru di tabel 'history'
+  Future<int> createHistory(Map<String, dynamic> data) async {
+    final db = await database;
+    return await db.insert('history', data);
+  }
+
+  /// Membaca riwayat transaksi berdasarkan email
+  Future<List<Map<String, dynamic>>> readHistoryByEmail(String email) async {
+    final db = await database;
+    final result = await db.query(
+      'history',
+      where: 'email = ?',
+      whereArgs: [email],
+      orderBy: 'date DESC',
+    );
+    return result;
+  }
+
+  /// Membaca semua riwayat transaksi
+  Future<List<Map<String, dynamic>>> readAllHistory() async {
+    final db = await database;
+    final result = await db.query('history', orderBy: 'date DESC');
+    return result;
+  }
+
+  /// Menghapus satu riwayat transaksi berdasarkan ID
+  Future<int> deleteHistory(int id) async {
+    final db = await database;
+    return await db.delete(
+      'history',
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 }

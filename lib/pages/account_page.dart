@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_arnold/services/firebase.dart';
+import 'package:mobile_arnold/utils/string_format.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; 
@@ -8,7 +9,7 @@ import '../providers/post_provider.dart';
 import 'edit_profile_page.dart';
 import 'change_password_page.dart';
 import 'about_page.dart';
-import 'history_page.dart';
+import 'payment_history_page.dart';
 import 'account_status_page.dart';
 import 'policy_page.dart';
 import 'help_page.dart';
@@ -280,7 +281,7 @@ class _AccountPageState extends State<AccountPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  username, 
+                                  username.toTitleCase(), 
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: theme.textTheme.bodyMedium!.fontSize,

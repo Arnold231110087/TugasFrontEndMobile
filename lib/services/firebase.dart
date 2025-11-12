@@ -203,6 +203,21 @@ class AuthService {
         .doc(searchedUid)
         .delete();
   }
+  Future<void> saveTransactionHistoryToFirebase(
+      String myUid, Map<String, dynamic> historyData) async {
+    
+    // Buat salinan data agar kita bisa memodifikasinya untuk Firestore
+    final firestoreData = Map<String, dynamic>.from(historyData);
+
+    // Tambahkan timestamp server untuk pengurutan yang akurat di cloud
+    firestoreData['serverTimestamp'] = FieldValue.serverTimestamp();
+
+    await _firestore
+        .collection('users')
+        .doc(myUid)
+        .collection('transaction_history') // <-- Koleksi baru
+        .add(firestoreData); // .add() untuk membuat ID dokumen unik
+  }
 
   /// Mengambil riwayat dari Firestore (untuk sinkronisasi saat login)
   Stream<QuerySnapshot<Map<String, dynamic>>> getSearchHistoryStream(String myUid) {

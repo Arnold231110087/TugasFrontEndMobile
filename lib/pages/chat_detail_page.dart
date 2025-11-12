@@ -64,12 +64,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       }
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Pesan terkirim"),
-        duration: Duration(seconds: 1),
-      ),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   const SnackBar(
+    //     content: Text("Pesan terkirim"),
+    //     duration: Duration(seconds: 1),
+    //   ),
+    // );
   }
 
   @override
