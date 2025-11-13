@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_arnold/services/firebase.dart';
-import '../../components/input_field_2_component.dart'; 
+import 'package:mobile_arnold/services/firebase.dart'; // Pastikan import ini benar
+import '../../components/input_field_2_component.dart'; // Pastikan path ini benar
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -14,8 +14,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   final AuthService _authService = AuthService();
   bool _isLoading = false;
@@ -26,10 +25,13 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
+      // Panggil fungsi register
       await _authService.register(email, password, username);
 
+      // --- SUKSES ---
       setState(() => _isLoading = false);
       if (!mounted) return;
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Akun berhasil dibuat! Silakan login."),
@@ -41,21 +43,44 @@ class _RegisterPageState extends State<RegisterPage> {
     } on FirebaseAuthException catch (e) {
       setState(() => _isLoading = false);
       String message;
+      
       if (e.code == 'email-already-in-use') {
         message = 'Email sudah terdaftar, gunakan email lain.';
       } else if (e.code == 'weak-password') {
         message = 'Kata sandi terlalu lemah (minimal 6 karakter).';
+      } else if (e.code == 'username-already-in-use') { 
+        // Error custom dari AuthService
+        message = 'Nama pengguna ini sudah terdaftar. Coba yang lain.';
+        // Rollback aman
+        await _authService.signOut(); 
       } else {
         message = e.message ?? 'Terjadi kesalahan.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
-      );
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
+      }
+
     } catch (e) {
+      // Error umum
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
-      );
+      String message = e.toString();
+      
+      if (message.contains('username-already-in-use')) { 
+        message = 'Nama pengguna ini sudah terdaftar. Coba yang lain.';
+        await _authService.signOut(); 
+      } else {
+        message = 'Registrasi gagal: $e';
+        await _authService.signOut(); 
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
@@ -71,6 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Mengembalikan Background Gradient Asli Anda
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -93,6 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 32),
+                
                 InputField2(
                   icon: Icons.person,
                   hint: 'Nama pengguna',
@@ -115,7 +142,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: confirmPasswordController,
                   obscureText: true,
                 ),
+                
                 const SizedBox(height: 24),
+                
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -133,55 +162,35 @@ class _RegisterPageState extends State<RegisterPage> {
                             final username = usernameController.text.trim();
                             final email = emailController.text.trim();
                             final password = passwordController.text.trim();
-                            final confirmPassword =
-                                confirmPasswordController.text.trim();
+                            final confirmPassword = confirmPasswordController.text.trim();
 
-                            if (username.isEmpty ||
-                                email.isEmpty ||
-                                password.isEmpty ||
-                                confirmPassword.isEmpty) {
+                            if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Semua kolom wajib diisi'),
-                                  backgroundColor: Colors.red,
-                                ),
+                                const SnackBar(content: Text('Semua kolom wajib diisi'), backgroundColor: Colors.red),
                               );
                               return;
                             }
                             if (username.length < 3) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Nama pengguna minimal 3 karakter'),
-                                  backgroundColor: Colors.red,
-                                ),
+                                const SnackBar(content: Text('Nama pengguna minimal 3 karakter'), backgroundColor: Colors.red),
                               );
                               return;
                             }
-                             if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
-                                .hasMatch(email)) {
+                             if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Format email tidak valid'),
-                                  backgroundColor: Colors.red,
-                                ),
+                                const SnackBar(content: Text('Format email tidak valid'), backgroundColor: Colors.red),
                               );
                               return;
                             }
                             if (password.length < 6) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Password minimal 6 karakter'),
-                                  backgroundColor: Colors.red,
-                                ),
+                                const SnackBar(content: Text('Password minimal 6 karakter'), backgroundColor: Colors.red),
                               );
                               return;
                             }
                             if (password != confirmPassword) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Konfirmasi password tidak cocok'),
-                                  backgroundColor: Colors.red,
-                                ),
+                                const SnackBar(content: Text('Konfirmasi password tidak cocok'), backgroundColor: Colors.red),
                               );
                               return;
                             }
@@ -200,18 +209,21 @@ class _RegisterPageState extends State<RegisterPage> {
                         : const Text('Buat akun'),
                   ),
                 ),
+                
                 const SizedBox(height: 24),
+                
                 const Text(
                   'Sudah punya akun?',
                   style: TextStyle(color: Colors.white),
                 ),
+                
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white),
                   ),
                   onPressed: () {
-                    if (_isLoading) return;
+                    if (_isLoading) return; // Mencegah back saat loading
                     Navigator.pop(context);
                   },
                   child: const Text('Masuk'),

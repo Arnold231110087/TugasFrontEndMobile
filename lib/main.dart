@@ -2,11 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_arnold/firebase_options.dart';
 import 'package:provider/provider.dart';
-// 'database.dart' tidak diperlukan di sini jika Anda tidak menggunakannya
-// import 'package:shared_preferences/shared_preferences.dart'; 
-// import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:intl/date_symbol_data_local.dart';
-// import 'package:path/path.dart';
 
 import 'providers/theme_provider.dart';
 import 'providers/post_provider.dart';
@@ -16,7 +12,6 @@ import 'screens/onboarding_screen.dart';
 import 'pages/auth/login_page.dart';
 import 'pages/auth/register_page.dart';
 import 'pages/auth/forgot_password_page.dart';
-// Import halaman baru untuk alur 2 langkah
 import 'pages/home_page.dart';
 import 'pages/search_page.dart';
 import 'pages/upload_page.dart';
@@ -26,21 +21,12 @@ import 'pages/account_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inisialisasi FFI untuk SQFlite (jika Anda menggunakannya di desktop)
-  // sqfliteFfiInit(); 
-  // databaseFactory = databaseFactoryFfi;
-  
-  // Inisialisasi untuk format tanggal (PENTING)
   await initializeDateFormatting('id_ID', null);
   
   // Inisialisasi Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
-  // Hapus 'deleteDatabase' kecuali Anda benar-benar ingin menghapusnya setiap kali
-  // await deleteDatabase(join(await getDatabasesPath(), 'history.db'));
   
   runApp(
     MultiProvider(
@@ -131,34 +117,28 @@ class MyApp extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       initialRoute: '/splash',
       
-      // --- RUTE DIPERBARUI ---
       routes: {
         '/': (context) => const MainNavigation(),
         '/splash': (context) => const SplashScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
-        // Tambahkan rute untuk alur 2 langkah
-        // '/create-profile': (context) => const CreateProfilePage(), 
         '/forgot-password': (context) => ForgotPasswordPage(),
       },
     );
   }
 }
 
-// --- NAVIGASI BAWAH DIPERBARUI ---
+// --- NAVIGASI BAWAH  ---
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
   @override
-  // Ubah menjadi 'MainNavigationState' (Publik)
   State<MainNavigation> createState() => MainNavigationState();
 }
 
-// Ubah menjadi 'MainNavigationState' (Publik)
 class MainNavigationState extends State<MainNavigation> {
-  // Ubah menjadi 'selectedIndex' (Publik)
   int selectedIndex = 0;
 
   final List<Widget> _pages = [
@@ -166,10 +146,9 @@ class MainNavigationState extends State<MainNavigation> {
     SearchPage(),
     UploadPage(),
     NotificationPage(),
-    AccountPage(), // Ini akan menjadi profil Anda (userId: null)
+    AccountPage(), 
   ];
 
-  // Ubah menjadi 'onItemTapped' (Publik)
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
