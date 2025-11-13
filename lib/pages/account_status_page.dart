@@ -57,7 +57,6 @@ class _AccountStatusPageState extends State<AccountStatusPage> {
             final Timestamp? joinTimestamp = userData?['createdAt'];
             final String joinDate = _formatJoinDate(joinTimestamp);
 
-            // Kembalikan UI dengan data dinamis
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

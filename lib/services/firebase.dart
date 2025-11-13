@@ -24,15 +24,14 @@ class AuthService {
     return userCredential;
   }
   
+  
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  /// (Versi Sederhana) Register TANPA cek username unik
   Future<UserCredential> register(
       String email, String password, String username) async {
     
-    // 1. Buat user di Firebase Authentication
     UserCredential userCredential;
     try {
       userCredential = await _auth.createUserWithEmailAndPassword(
@@ -48,7 +47,6 @@ class AuthService {
       throw Exception("Gagal membuat user, user null.");
     }
 
-    // 2. Siapkan data (tetap lowercase agar pencarian mudah)
     final String lowerUsername = username.toLowerCase();
     
     final userDataMap = {
@@ -59,16 +57,12 @@ class AuthService {
       'createdAt': Timestamp.now(), 
     };
 
-    // 3. Simpan ke Firestore (Langsung ke koleksi 'users')
     try {
       await _firestore.collection('users').doc(user.uid).set(userDataMap);
       
-      // 4. Simpan ke SQFlite
       await _saveUserDataToLocal(userDataMap);
 
     } catch (e) {
-      // Jika gagal simpan data, hapus akun Auth agar bisa daftar ulang
-      // (Ini aman di sini karena tidak ada transaksi yang menggantung)
       await user.delete();
       throw Exception("Gagal menyimpan profil: $e");
     }
@@ -76,7 +70,7 @@ class AuthService {
     return userCredential;
   }
 
-  // --- Helper & Fungsi Lain (Tetap Sama) ---
+  // --- Helper & Fungsi Lain  ---
 
   Future<void> changePassword(String currentPassword, String newPassword) async {
     User? user = _auth.currentUser;
@@ -95,7 +89,7 @@ class AuthService {
       await _firestore.collection('users').doc(user.uid).delete();
       await _localDb.deleteUser(user.uid); 
     } catch (e) {
-      throw Exception("Gagal hapus data: $e");
+      throw Exception("Gagal hapus data: Terjadi Kesalahan. Silahkan ulangi beberapa saat lagi.");
     }
     await _auth.currentUser!.delete(); 
   }

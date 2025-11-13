@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_arnold/services/firebase.dart'; // Pastikan import ini benar
-import '../../components/input_field_2_component.dart'; // Pastikan path ini benar
+import 'package:mobile_arnold/services/firebase.dart'; 
+import '../../components/input_field_2_component.dart'; 
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -223,7 +223,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     side: const BorderSide(color: Colors.white),
                   ),
                   onPressed: () {
-                    if (_isLoading) return; // Mencegah back saat loading
+                    if (_isLoading) return; 
                     Navigator.pop(context);
                   },
                   child: const Text('Masuk'),

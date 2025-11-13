@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_arnold/services/firebase.dart';
-import 'package:mobile_arnold/utils/string_format.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -87,7 +86,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     try {
       Map<String, dynamic> dataToUpdate = {
-        'username': username, // AuthService akan menanganinya (lowercase, cek unik, dll)
+        'username': username,
         'bio': bioController.text.trim(),
         if (_selectedDate != null) 'dob': Timestamp.fromDate(_selectedDate!),
       };
