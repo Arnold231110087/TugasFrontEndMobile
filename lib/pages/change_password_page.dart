@@ -17,12 +17,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  // --- Tambahan ---
+
   final AuthService _authService = AuthService();
   bool _isLoading = false;
-  // --- Akhir Tambahan ---
 
-  // Fungsi helper untuk SnackBar
   void _showSnack(String message, Color backgroundColor) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -34,9 +32,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   void _submit() {
-    // 1. Validasi form
+
     if (_formKey.currentState!.validate()) {
-      // 2. Tampilkan dialog konfirmasi
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -49,24 +46,20 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             ),
             TextButton(
               child: const Text("OK"),
-              // 3. Buat aksi "OK" menjadi async
               onPressed: () async {
-                Navigator.of(context).pop(); // Tutup dialog
+                Navigator.of(context).pop();
                 setState(() => _isLoading = true);
 
                 try {
-                  // 4. Panggil service
                   await _authService.changePassword(
                     _oldPasswordController.text.trim(),
                     _newPasswordController.text.trim(),
                   );
 
-                  // 5. Beri feedback sukses
                   _showSnack("Password berhasil diubah", Colors.green);
-                  if (mounted) Navigator.pop(context); // Kembali ke halaman profil
+                  if (mounted) Navigator.pop(context); 
 
                 } on FirebaseAuthException catch (e) {
-                  // 6. Tangani error dari Firebase
                   String message;
                   if (e.code == 'wrong-password' || e.code == 'INVALID_LOGIN_CREDENTIALS') {
                     message = "Password lama Anda salah.";
@@ -77,7 +70,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 } catch (e) {
                   _showSnack("Terjadi kesalahan: $e", Colors.red);
                 } finally {
-                  // 7. Selalu set loading ke false
                   if (mounted) setState(() => _isLoading = false);
                 }
               },
@@ -98,7 +90,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    // --- UI Anda tidak berubah, hanya update tombol ---
     return Scaffold(
       appBar: AppBar(
         title: const Text("Ganti Password"),
@@ -128,7 +119,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   if (value == null || value.isEmpty) {
                     return "Masukkan password baru";
                   }
-                  if (value.length < 6) { // <-- Tambahan validasi
+                  if (value.length < 6) {
                     return "Password minimal 6 karakter";
                   }
                   if (value == _oldPasswordController.text) {
@@ -155,7 +146,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  // --- Update Tombol ---
                   onPressed: _isLoading ? null : _submit,
                   child: _isLoading
                       ? const SizedBox(
@@ -167,7 +157,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           ),
                         )
                       : const Text("Simpan"),
-                  // --- Akhir Update Tombol ---
                 ),
               ),
             ],

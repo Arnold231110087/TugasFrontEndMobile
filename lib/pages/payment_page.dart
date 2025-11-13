@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_arnold/services/firebase.dart';
 import '../utils/rupiah_format.dart';
 import 'payment_success_page.dart';
-// import '../services/history_database.dart'; // <-- HAPUS INI
-import '../services/database.dart'; // <-- INI SUDAH BENAR (File gabungan)
-import '../services/firebase.dart'; // <-- 1. TAMBAHKAN IMPORT AUTHSERVICE
+import '../services/database.dart'; 
 import '../components/payment_option.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -23,12 +22,8 @@ class PaymentPage extends StatefulWidget {
 class _BankPageState extends State<PaymentPage> {
   String selectedPayment = '';
   
-  // --- 2. TAMBAHKAN INSTANCE SERVICE ---
   final LocalDatabase _localDb = LocalDatabase();
   final AuthService _authService = AuthService();
-  // --- AKHIR TAMBAHAN ---
-
-  // Hapus _getUserEmail(), kita akan ambil langsung dari authService
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +33,15 @@ class _BankPageState extends State<PaymentPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        // ... (AppBar Anda tetap sama)
+        automaticallyImplyLeading: true,
+        title: Text(
+          'METODE PEMBAYARAN',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: theme.textTheme.displayLarge!.fontSize,
+            color: theme.textTheme.displayLarge!.color,
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -52,7 +55,12 @@ class _BankPageState extends State<PaymentPage> {
                 children: [
                   Text(
                     rupiahFormat(widget.amount),
-                    // ... (Text Style Anda tetap sama)
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 32,
+                      color: theme.textTheme.headlineLarge!.color,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   ...options.expand<Widget>((option) => [
@@ -83,11 +91,9 @@ class _BankPageState extends State<PaymentPage> {
               padding: const EdgeInsets.all(24),
               width: double.infinity,
               child: TextButton(
-                // --- 3. PERBARUI LOGIKA 'onPressed' ---
                 onPressed: () async {
                   final now = DateTime.now();
                   
-                  // Ambil user yang sedang login dari AuthService
                   final user = _authService.currentUser;
 
                   if (user == null || user.email == null) {
@@ -104,7 +110,7 @@ class _BankPageState extends State<PaymentPage> {
                   final String uid = user.uid;
 
                   final newHistory = {
-                    'email': email, // Simpan berdasarkan email (sesuai skema lokal)
+                    'email': email,
                     'title': 'Pembayaran Berhasil',
                     'description': 'Pembelian logo dengan metode $selectedPayment',
                     'profile': 'assets/images/profile1.png',
@@ -116,14 +122,12 @@ class _BankPageState extends State<PaymentPage> {
                   };
 
                   try {
-                    // 1. Simpan ke Cache SQFlite
-                    // (Gunakan fungsi dari file database.dart gabungan Anda)
+                    // Simpan ke Cache SQFlite
                     await _localDb.createHistory(newHistory);
 
-                    // 2. Simpan ke Firebase Firestore
+                    // Simpan ke Firebase Firestore
                     await _authService.saveTransactionHistoryToFirebase(uid, newHistory);
 
-                    // 3. Navigasi jika sukses
                     if (context.mounted) {
                       Navigator.pushReplacement(
                         context,
@@ -141,7 +145,6 @@ class _BankPageState extends State<PaymentPage> {
                     );
                   }
                 },
-                // --- AKHIR PERUBAHAN ---
                 child: const Text('Bayar'),
               ),
             ),

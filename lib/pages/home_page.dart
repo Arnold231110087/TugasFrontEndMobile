@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_arnold/services/firebase.dart';
 import 'package:mobile_arnold/utils/string_format.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // <-- 1. Tambahkan Import
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 import 'chat_page.dart';
 import 'post_follow_page.dart'; 
 import '../components/best_designer_card_component.dart';
 import '../components/post_card_component.dart';
 import '../components/transaction_card_component.dart';
 import 'account_page.dart'; 
-import '../providers/theme_provider.dart';
 
-// --- 4. UBAH MENJADI STATEFULWIDGET ---
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -22,34 +19,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   
-  // --- 5. TAMBAHKAN STATE UNTUK DATA DINAMIS ---
   final AuthService _authService = AuthService();
   List<Map<String, dynamic>> _bestDesigners = [];
   bool _isLoadingDesigners = true;
-  // --- AKHIR TAMBAHAN ---
 
   @override
   void initState() {
     super.initState();
-    _loadBestDesigners(); // Panggil fungsi load data
+    _loadBestDesigners();
   }
 
-  /// (BARU) Mengambil user dari Firestore
   Future<void> _loadBestDesigners() async {
     setState(() => _isLoadingDesigners = true);
     
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('users')
-          // Ambil user selain diri sendiri
           .where(FieldPath.documentId, isNotEqualTo: _authService.currentUser?.uid) 
-          .limit(5) // Ambil 5 user (ini acak sederhana)
+          .limit(5) 
           .get();
 
       List<Map<String, dynamic>> designers = [];
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> userData = doc.data();
-        userData['uid'] = doc.id; // Simpan UID
+        userData['uid'] = doc.id; 
         designers.add(userData);
       }
 
@@ -60,7 +53,6 @@ class _HomePageState extends State<HomePage> {
         });
       }
     } catch (e) {
-      print("Gagal memuat desainer: $e");
       if (mounted) {
         setState(() {
           _isLoadingDesigners = false;
@@ -82,11 +74,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    // (Provider tema tidak lagi diperlukan di sini karena kita ambil dari context)
-    // final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor, 
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
@@ -153,26 +143,24 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Lihat desainer populer di platform kami', // Ganti subjudul
+                  'Lihat desainer populer di platform kami',
                   style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 24),
                 
-                // --- 6. PERBARUI BAGIAN INI ---
                 SizedBox(
                   height: 119,
                   child: _isLoadingDesigners
                       ? const Center(child: CircularProgressIndicator())
                       : _bestDesigners.isEmpty
                           ? const Center(child: Text('Tidak ada desainer lain ditemukan.'))
-                          : ListView.separated(
+                          : ListView.separated( 
                               scrollDirection: Axis.horizontal,
                               itemCount: _bestDesigners.length,
                               separatorBuilder: (context, index) => const SizedBox(width: 20),
                               itemBuilder: (context, index) {
                                 final designer = _bestDesigners[index];
                                 
-                                // Ambil data dinamis
                                 final String designerUid = designer['uid'];
                                 final String designerName = (designer['username'] ?? 'Desainer').toString().toTitleCase();
                                 final String sales = (designer['salesCount'] ?? 0).toString() + ' Penjualan';
@@ -187,7 +175,6 @@ class _HomePageState extends State<HomePage> {
                                   followers: followers,
                                   imageAsset: imageAsset,
                                   onTap: () {
-                                    // Navigasi ke AccountPage dengan UID
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -201,7 +188,6 @@ class _HomePageState extends State<HomePage> {
                               },
                             ),
                 ),
-                // --- AKHIR PERUBAHAN ---
 
                 const SizedBox(height: 60),
                 Row(
@@ -233,8 +219,7 @@ class _HomePageState extends State<HomePage> {
                   rating: 5.0,
                   imageAsset: 'assets/images/profile3.png',
                   onProfileTap: () {
-                    // TODO: Ganti ini agar navigasi pakai UID jika datanya dinamis
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage(userId: '...')));
+                    // TODO: Navigasi ke profil Kevin
                   },
                 ),
                 const SizedBox(height: 16),
@@ -244,11 +229,10 @@ class _HomePageState extends State<HomePage> {
                   rating: 4.0,
                   imageAsset: 'assets/images/profile4.png',
                   onProfileTap: () {
-                     // TODO: Ganti ini agar navigasi pakai UID jika datanya dinamis
+                     // TODO: Navigasi ke profil Ahmad
                   },
                 ),
                 
-                // --- BAGIAN INI TIDAK DISENTUH ---
                 const SizedBox(height: 60),
                 Text(
                   'Akun yang anda ikuti',

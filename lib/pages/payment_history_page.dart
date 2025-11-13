@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_arnold/components/history_component.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import '../services/history_database.dart'; // <-- HAPUS IMPORT INI
-import '../services/database.dart'; // <-- Gunakan file database utama
+import 'package:mobile_arnold/components/history_component.dart'; 
+import '../services/database.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -13,9 +12,8 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   List<Map<String, dynamic>> history = [];
-  bool _isLoading = true; // Tambahkan state loading
-
-  // Buat instance dari database utama
+  bool _isLoading = true;
+  
   final LocalDatabase _localDb = LocalDatabase();
 
   @override
@@ -27,18 +25,15 @@ class _HistoryPageState extends State<HistoryPage> {
   Future<void> _loadHistory() async {
     setState(() => _isLoading = true);
     
-    // Ambil email dari LocalDatabase
-    // (Asumsi: Anda punya fungsi untuk mengambil email user yang sedang login)
-    // Jika tidak, Anda harus mengambilnya dari AuthService/SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('email');
+    final email = prefs.getString('email'); 
 
     if (email != null) {
-      // Panggil fungsi yang sudah digabung di LocalDatabase
       final data = await _localDb.readHistoryByEmail(email);
       if (mounted) {
         setState(() {
-          history = List.from(data); // <-- FIX: Buat list yang bisa diubah
+          // Buat salinan list agar bisa dimodifikasi (mutable)
+          history = List.from(data);
           _isLoading = false;
         });
       }
@@ -71,17 +66,13 @@ class _HistoryPageState extends State<HistoryPage> {
                 final item = history[index];
                 final deletedId = item['id'];
 
-                print("🗑 Menghapus ID: $deletedId");
-
                 if (deletedId != null) {
-                  // Panggil fungsi yang sudah digabung di LocalDatabase
-                  final deletedRows =
-                      await _localDb.deleteHistory(deletedId);
+                  final deletedRows = await _localDb.deleteHistory(deletedId);
 
                   if (deletedRows > 0) {
                     Navigator.of(dialogContext).pop(true);
                     setState(() {
-                      history.removeAt(index); // Ini sekarang aman
+                      history.removeAt(index);
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -104,8 +95,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   Navigator.of(dialogContext).pop(false);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content:
-                          Text('Gagal menghapus: ID transaksi tidak ditemukan'),
+                      content: Text('Gagal menghapus: ID transaksi tidak ditemukan'),
                     ),
                   );
                 }
@@ -132,7 +122,6 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ),
       ),
-      // Tampilkan loading spinner
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
         : history.isEmpty

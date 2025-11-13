@@ -4,7 +4,7 @@ import 'package:mobile_arnold/services/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../components/input_field_1_component.dart'; // Sesuaikan path
+import '../components/input_field_1_component.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -14,18 +14,17 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final AuthService _authService = AuthService(); // Instance service
+  final AuthService _authService = AuthService();
 
-  // Controller diinisialisasi kosong
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
 
   DateTime? _selectedDate;
-  bool _isLoading = false; // Untuk loading data awal
-  bool _isSaving = false;  // Untuk loading saat simpan
-  String _uid = ''; // Untuk menyimpan UID user
+  bool _isLoading = false;
+  bool _isSaving = false; 
+  String _uid = '';
 
   @override
   void initState() {
@@ -78,7 +77,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     setState(() => _isSaving = true); 
     
-    // Validasi sederhana (opsional, tapi bagus)
     final username = nameController.text.trim();
     if (username.length < 3) {
       _showSnack('Username minimal 3 karakter', Colors.red);
@@ -88,17 +86,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     try {
       Map<String, dynamic> dataToUpdate = {
-        'username': username.toLowerCase(),
+        'username': username, // AuthService akan menanganinya (lowercase, cek unik, dll)
         'bio': bioController.text.trim(),
         if (_selectedDate != null) 'dob': Timestamp.fromDate(_selectedDate!),
       };
 
-      // Panggil service (versi sederhana)
       await _authService.updateUserProfileData(_uid, dataToUpdate);
 
-      // Update SharedPreferences (cache lokal)
+      // Update SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', nameController.text.trim());
+      await prefs.setString('username', username);
       await prefs.setString('bio', bioController.text.trim());
 
       _showSnack('Profil berhasil disimpan', Colors.green);
@@ -107,9 +104,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) Navigator.pop(context);
 
+    } on FirebaseAuthException catch (e) {
+      setState(() => _isSaving = false);
+      String message;
+      if (e.code == 'username-already-in-use') {
+        message = 'Nama pengguna ini sudah diambil. Coba yang lain.';
+      } else {
+        message = 'Gagal menyimpan: ${e.message}';
+      }
+      _showSnack(message, Colors.red);
+      
     } catch (e) {
-      // Error handling sederhana
-      _showSnack('Gagal menyimpan profil: $e', Colors.red);
+      String message = e.toString();
+      if (message.contains('username-already-in-use')) {
+         message = 'Nama pengguna ini sudah diambil. Coba yang lain.';
+      } else {
+         message = 'Gagal menyimpan profil: $e';
+      }
+      
+      _showSnack(message, Colors.red);
       if (mounted) {
         setState(() => _isSaving = false);
       }
