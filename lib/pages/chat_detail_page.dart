@@ -63,13 +63,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       }
     });
-
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   const SnackBar(
-    //     content: Text("Pesan terkirim"),
-    //     duration: Duration(seconds: 1),
-    //   ),
-    // );
   }
 
   @override

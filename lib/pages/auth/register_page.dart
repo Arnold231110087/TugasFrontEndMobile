@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_arnold/services/firebase.dart';
-import '../../components/input_field_2_component.dart'; // Sesuaikan path
+import '../../components/input_field_2_component.dart'; 
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -26,10 +26,8 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
-      // Panggil fungsi register 1 langkah yang sederhana
       await _authService.register(email, password, username);
 
-      // --- SUKSES ---
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -38,13 +36,11 @@ class _RegisterPageState extends State<RegisterPage> {
           backgroundColor: Colors.green,
         ),
       );
-      // Navigasi ke halaman login
       Navigator.pushReplacementNamed(context, '/login');
 
     } on FirebaseAuthException catch (e) {
       setState(() => _isLoading = false);
       String message;
-      // Error handling sederhana (tanpa cek username unik)
       if (e.code == 'email-already-in-use') {
         message = 'Email sudah terdaftar, gunakan email lain.';
       } else if (e.code == 'weak-password') {

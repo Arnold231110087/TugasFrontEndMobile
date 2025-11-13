@@ -17,7 +17,6 @@ import 'pages/auth/login_page.dart';
 import 'pages/auth/register_page.dart';
 import 'pages/auth/forgot_password_page.dart';
 // Import halaman baru untuk alur 2 langkah
-import 'pages/auth/create_profile_page.dart'; 
 import 'pages/home_page.dart';
 import 'pages/search_page.dart';
 import 'pages/upload_page.dart';

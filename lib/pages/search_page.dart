@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mobile_arnold/services/database.dart'; // Import SQFlite Anda
+import 'package:mobile_arnold/services/database.dart';
 import 'package:mobile_arnold/services/firebase.dart';
 import 'package:mobile_arnold/utils/string_format.dart';
-import '../components/search_account_component.dart'; // Komponen UI
-import 'logo_detail_page.dart'; // Halaman detail logo Anda
-import '../services/logo_dev_service.dart'; // Service logo Anda
-import 'account_page.dart'; // Halaman Akun untuk navigasi
-import '../main.dart'; // Import main.dart untuk MainNavigationState
+import '../components/search_account_component.dart';
+import 'logo_detail_page.dart';
+import '../services/logo_dev_service.dart';
+import 'account_page.dart';
+import '../main.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -23,22 +23,21 @@ class _SearchPageState extends State<SearchPage>
   late TabController _tabController;
   Timer? _debounce;
 
-  // State untuk hasil pencarian Akun dari Firebase
+  // State Pencarian Akun
   List<Map<String, dynamic>> _filteredAccounts = [];
   bool _isSearchingAccount = false;
   bool _noAccountResults = false;
 
-  // State untuk Riwayat Pencarian (dari SQFlite)
+  // State Riwayat Pencarian
   List<Map<String, dynamic>> _searchedAccounts = [];
   bool _isLoadingHistory = true;
 
-  // State untuk pencarian Logo
+  // State Pencarian Logo
   final LogoDevService _logoService = LogoDevService();
   List<Map<String, dynamic>> _logoResults = [];
   bool _isSearchingLogo = false;
   String _logoError = '';
 
-  // State untuk AuthService dan UID pengguna
   final AuthService _authService = AuthService();
   final LocalDatabase _localDb = LocalDatabase();
   String? _myUid;
@@ -50,18 +49,17 @@ class _SearchPageState extends State<SearchPage>
     _searchController.addListener(_onSearchChanged);
     
     _myUid = _authService.currentUser?.uid;
-    // Muat riwayat dari lokal saat init
     _loadLocalHistory();
   }
 
-  /// Memuat riwayat dari SQFlite
+  /// Memuat riwayat pencarian dari database lokal (SQFlite)
   Future<void> _loadLocalHistory() async {
     if (_myUid == null) return;
     setState(() => _isLoadingHistory = true);
+    
     final history = await _localDb.getSearchHistory(_myUid!);
     if (mounted) {
       setState(() {
-        // PERBAIKAN: Buat salinan list yang bisa diubah (mutable)
         _searchedAccounts = List.from(history);
         _isLoadingHistory = false;
       });
@@ -77,7 +75,7 @@ class _SearchPageState extends State<SearchPage>
     super.dispose();
   }
 
-  /// Dipanggil setiap kali teks di search bar berubah
+  /// Handler untuk perubahan teks pencarian (dengan debounce)
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase(); 
 
@@ -87,24 +85,24 @@ class _SearchPageState extends State<SearchPage>
       if (!mounted) return;
       
       if (_tabController.index == 0) {
-        // --- LOGIKA TAB AKUN ---
+        // Tab Akun
         if (query.isEmpty) {
           setState(() {
             _isSearchingAccount = false;
             _filteredAccounts.clear();
             _noAccountResults = false;
           });
-          _loadLocalHistory(); // Muat ulang riwayat
+          _loadLocalHistory(); 
         } else {
           _searchAccounts(query);
         }
       } else {
-        // --- LOGIKA TAB LOGO ---
+        // Tab Logo
         if (query.isNotEmpty) {
           _searchLogos(query);
         } else {
           setState(() {
-            _isSearchingLogo = false; // Pastikan loading berhenti
+            _isSearchingLogo = false;
             _logoResults.clear();
             _logoError = '';
           });
@@ -113,7 +111,7 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
-  /// Fungsi untuk mencari akun di Firebase
+  /// Mencari akun di Firestore menggunakan prefix search
   Future<void> _searchAccounts(String query) async {
     setState(() {
       _isSearchingAccount = true; 
@@ -152,7 +150,7 @@ class _SearchPageState extends State<SearchPage>
     }
   }
 
-  /// Fungsi untuk mencari logo (dari service Anda)
+  /// Mencari logo menggunakan LogoDevService
   Future<void> _searchLogos(String query) async {
     setState(() {
       _isSearchingLogo = true;
@@ -182,54 +180,47 @@ class _SearchPageState extends State<SearchPage>
     }
   }
 
-  /// Fungsi untuk menghapus riwayat pencarian
+  /// Menghapus riwayat pencarian dari Lokal dan Cloud
   void _deleteSearchedAccount(Map<String, dynamic> account) async {
     if (_myUid == null) return;
     
     final String searchedUid = account['searchedUid']; 
     final String username = account['username'];
 
-    // Hapus dari state
     setState(() {
       _searchedAccounts.removeWhere((item) => item['searchedUid'] == searchedUid);
     });
     
-    // Hapus dari SQFlite (cepat)
     await _localDb.deleteSearchHistory(_myUid!, searchedUid);
-    // Hapus dari Firebase (latar belakang)
     _authService.deleteSearchHistoryFromFirebase(_myUid!, searchedUid);
 
-    // if (mounted) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text('Akun "$username" dihapus dari riwayat.'),
-    //       backgroundColor: Colors.grey.shade700,
-    //     ),
-    //   );
-    // }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Akun "$username" dihapus dari riwayat.'),
+          backgroundColor: Colors.grey.shade700,
+        ),
+      );
+    }
   }
 
-  /// Fungsi untuk menyimpan riwayat saat hasil diklik
+  /// Menyimpan riwayat pencarian ke Lokal dan Cloud
   Future<void> _saveToHistory(Map<String, dynamic> account) async {
-     if (_myUid == null || _myUid == account['uid']) return; // Jangan simpan diri sendiri
+     if (_myUid == null || _myUid == account['uid']) return; 
 
      final historyItem = {
        'userId': _myUid!,
-       'searchedUid': account['uid'], // uid dari user yg dicari
+       'searchedUid': account['uid'], 
        'username': account['username'],
        'timestamp': DateTime.now().millisecondsSinceEpoch
      };
 
-     // Simpan ke SQFlite (cepat)
      await _localDb.addSearchHistory(historyItem);
-     // Simpan ke Firebase (latar belakang)
      _authService.saveSearchHistoryToFirebase(_myUid!, account);
   }
 
-
-  /// Membangun UI untuk tab "Akun"
   Widget _buildAccountTab(ThemeData theme) {
-    // --- TAMPILKAN HASIL PENCARIAN ---
+    // Tampilan Hasil Pencarian
     if (_isSearchingAccount) {
       if (_noAccountResults) {
         return _buildNoAccountFound(theme);
@@ -239,42 +230,30 @@ class _SearchPageState extends State<SearchPage>
         itemCount: _filteredAccounts.length,
         itemBuilder: (context, index) {
           final account = _filteredAccounts[index];
-          
           final String username = account['username'] ?? 'Nama tidak ada';
           final String uid = account['uid'];
           final String followers = (account['followerCount']?.toString() ?? '0') + ' pengikut';
-          final double? rating = (account['rating'] is num) ? (account['rating'] as num).toDouble() : null;
-
+          
           return SearchAccount(
             key: ValueKey(uid), 
-            name: username.toTitleCase(),
+            name: username.toTitleCase(), 
             followers: followers,
-            rating: rating,
-            followsYou: false, 
-            isFriend: false,   
             onDelete: null, 
-            onTap: () async { // <-- 1. Jadikan 'async'
-              // Simpan ke riwayat
+            onTap: () async {
               _saveToHistory(account); 
               
               if (uid == _myUid) {
-                // INI PROFIL SAYA
+                // Pindah ke tab profil sendiri
                 context.findAncestorStateOfType<MainNavigationState>()?.onItemTapped(4); 
-                
-                // 2. Bersihkan controller saat pindah tab
                 _searchController.clear();
-
               } else {
-                // INI PROFIL ORANG LAIN
-                // 3. 'await' (Tunggu) sampai halaman baru ditutup (di-pop)
+                // Buka halaman profil orang lain
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => AccountPage(userId: uid), 
                   ),
                 );
-
-                // 4. SETELAH KEMBALI (pop), baru bersihkan controller
                 _searchController.clear(); 
               }
             },
@@ -283,7 +262,7 @@ class _SearchPageState extends State<SearchPage>
       );
     }
 
-    // --- TAMPILKAN RIWAYAT PENCARIAN ---
+    // Tampilan Riwayat Pencarian
     if (_isLoadingHistory) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -302,8 +281,7 @@ class _SearchPageState extends State<SearchPage>
                  color: theme.textTheme.bodyMedium!.color,
                ),
              ),
-             // Tombol 'Lihat semua' (jika diperlukan)
-             // Text('Lihat semua', style: theme.textTheme.headlineSmall),
+             Text('Lihat semua', style: theme.textTheme.headlineSmall),
            ],
         ),
         const SizedBox(height: 12),
@@ -312,13 +290,12 @@ class _SearchPageState extends State<SearchPage>
             padding: const EdgeInsets.symmetric(vertical: 32.0),
             child: Center(
               child: Text(
-                'Riwayat pencarian Anda kosong.',
+                'Riwayat pencarian kosong.',
                 style: theme.textTheme.labelMedium,
               )
             ),
           )
         else
-          // Tampilkan riwayat dari SQFlite
           ..._searchedAccounts.map((account) {
             final String username = account['username'];
             final String searchedUid = account['searchedUid']; 
@@ -326,7 +303,7 @@ class _SearchPageState extends State<SearchPage>
             return SearchAccount(
               key: ValueKey(searchedUid),
               name: username.toTitleCase(),
-              followers: 'Riwayat pencarian', // Subtitle
+              followers: 'Riwayat pencarian',
               onDelete: () => _deleteSearchedAccount(account),
               onTap: () {
                 if (searchedUid == _myUid) {
@@ -346,7 +323,6 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
-  /// Membangun UI untuk 'user tidak ditemukan'
   Widget _buildNoAccountFound(ThemeData theme) {
     return Center(
       child: Column(
@@ -372,7 +348,6 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
-  /// Membangun UI untuk tab "Logo"
   Widget _buildLogoTab(ThemeData theme) {
     return Column(
       children: [
@@ -430,7 +405,6 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 
-  /// Build utama
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

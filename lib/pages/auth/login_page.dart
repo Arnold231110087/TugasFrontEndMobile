@@ -1,9 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_arnold/services/firebase.dart';
 import 'package:mobile_arnold/utils/string_format.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Tetap perlu untuk error handling
-import '../../components/input_field_2_component.dart';
-import '../../services/firebase.dart';
+import '../../components/input_field_2_component.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  final AuthService _authService = AuthService(); // Instance service
+  final AuthService _authService = AuthService();
 
   bool _isLoading = false;
 
@@ -25,7 +25,6 @@ class _LoginPageState extends State<LoginPage> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     
-    // --- Validasi Input ---
     final emailRegex =
         r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
 
@@ -45,9 +44,8 @@ class _LoginPageState extends State<LoginPage> {
       _showSnack('Kata sandi minimal 6 karakter', theme);
       return;
     }
-    // --- Akhir Validasi ---
 
-    setState(() => _isLoading = true); // <-- 1. Loading DIMULAI
+    setState(() => _isLoading = true);
 
     try {
       // 1. Panggil service untuk login
@@ -59,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
 
         // 2. Panggil service untuk ambil data user
         final userData = await _authService.getUserData(user.uid);
-        String username = userData?['username'].toString().toTitleCase() ?? user.email!;
+        String username = userData?['username']?.toString().toTitleCase() ?? user.email!;
         String bio = userData?['bio'] ?? '';
 
         // 3. Simpan sesi
@@ -70,37 +68,28 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('uid', user.uid); 
         await prefs.setString('bio', bio);
 
-        // --- INI PERBAIKANNYA (JIKA SUKSES) ---
-        setState(() => _isLoading = false); // <-- 4. Loading DIHENTIKAN
+        setState(() => _isLoading = false);
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/'); // <-- 5. Baru Navigasi
-        // --- AKHIR PERBAIKAN ---
+        Navigator.pushReplacementNamed(context, '/');
 
       } else {
-         // Handle jika user null (meskipun jarang terjadi)
-        setState(() => _isLoading = false); // <-- Hentikan loading
+        setState(() => _isLoading = false);
         _showSnack('Gagal mendapatkan detail user', theme);
       }
 
     } on FirebaseAuthException catch (e) {
-      // --- PERBAIKAN JIKA GAGAL ---
-      setState(() => _isLoading = false); // <-- Loading DIHENTIKAN
-      // --- AKHIR PERBAIKAN ---
+      setState(() => _isLoading = false); 
 
       String message;
-      if (e.code == 'user-not-found' || e.code == 'INVALID_LOGIN_CREDENTIALS') {
-        message = 'Email belum terdaftar atau kata sandi salah.';
-      } else if (e.code == 'wrong-password') {
-        message = 'Kata sandi salah, silakan coba lagi.';
-      } else {
+      if (e.code == 'user-not-found' || e.code == 'INVALID_LOGIN_CREDENTIALS' || e.code == 'wrong-password') {
         message = 'Email atau kata sandi salah.';
+      } else {
+        message = 'Terjadi kesalahan: ${e.message}';
       }
       _showSnack(message, theme);
 
     } catch (e) {
-      // --- PERBAIKAN JIKA GAGAL ---
-      setState(() => _isLoading = false); // <-- Loading DIHENTIKAN
-      // --- AKHIR PERBAIKAN ---
+      setState(() => _isLoading = false);
       _showSnack('Terjadi kesalahan: $e', theme);
     } 
   }
@@ -127,7 +116,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // --- (Seluruh kode UI Anda tidak berubah) ---
     final theme = Theme.of(context);
 
     return WillPopScope(
@@ -158,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                       backgroundColor: Colors.white,
                       child: ClipOval(
                         child: Image.asset(
-                          "assets/images/logo.jpg", // Pastikan path ini benar
+                          "assets/images/logo.jpg",
                           width: 100,
                           fit: BoxFit.cover,
                         ),
@@ -203,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: _isLoading ? null : _login, // Terhubung ke _login
+                      onPressed: _isLoading ? null : _login,
                       child: _isLoading
                           ? const SizedBox(
                               height: 20,

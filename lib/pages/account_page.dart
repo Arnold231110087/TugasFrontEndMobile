@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_arnold/pages/payment_history_page.dart';
 import 'package:mobile_arnold/services/firebase.dart';
 import 'package:mobile_arnold/utils/string_format.dart';
 import 'package:provider/provider.dart';
@@ -9,13 +10,12 @@ import '../providers/post_provider.dart';
 import 'edit_profile_page.dart';
 import 'change_password_page.dart';
 import 'about_page.dart';
-import 'payment_history_page.dart';
 import 'account_status_page.dart';
 import 'policy_page.dart';
 import 'help_page.dart';
 import 'post_page.dart';
 import 'sales_page.dart';
-import 'chat_detail_page.dart'; // <-- Tambahkan ini
+import 'chat_detail_page.dart'; 
 import '../components/drawer_section_component.dart';
 import '../components/account_page_section_button_component.dart';
 
@@ -33,8 +33,8 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   int selectedTab = 0;
-  
   final AuthService _authService = AuthService();
+  
   String? _uid;
   bool _isMyProfile = false; 
   bool _isFollowing = false; 
@@ -43,25 +43,18 @@ class _AccountPageState extends State<AccountPage> {
   void initState() {
     super.initState();
     
-    // --- PERBAIKAN LOGIKA DI SINI ---
-    String? currentLoggedInUid = _authService.currentUser?.uid;
+    final currentLoggedInUid = _authService.currentUser?.uid;
 
+    // Tentukan apakah ini profil saya atau orang lain
     if (widget.userId == null || widget.userId == currentLoggedInUid) {
-      // Ini adalah profil SAYA jika:
-      // 1. Dibuka dari tab bar (widget.userId == null)
-      // 2. Dibuka dari search TAPI userId-nya == UID saya
       _uid = currentLoggedInUid;
       _isMyProfile = true;
     } else {
-      // Ini adalah profil ORANG LAIN
       _uid = widget.userId;
       _isMyProfile = false;
-      // TODO: Tambahkan logika cek 'isFollowing'
     }
-    // --- AKHIR PERBAIKAN ---
   }
 
-  // (List 'drawers', 'stats', 'sections' Anda tetap sama)
   final List<Map<String, dynamic>> drawers = [
     {
       'section': 'Akun',
@@ -125,7 +118,6 @@ class _AccountPageState extends State<AccountPage> {
       'messages': <Map<String, dynamic>>[], 
     };
   }
-
 
   @override
   Widget build(BuildContext context) {

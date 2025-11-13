@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../services/firebase.dart'; // Perlu untuk error handling
+import '../../services/firebase.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -17,7 +17,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  final AuthService _authService = AuthService(); // <-- TAMBAHKAN INI
+  final AuthService _authService = AuthService(); 
   bool _isLoading = false;
 
   void _showSnack(String message, Color backgroundColor) {
@@ -35,7 +35,6 @@ class _ChangePasswordState extends State<ChangePassword> {
     final String newPassword = _newPasswordController.text.trim();
     final String confirmPassword = _confirmPasswordController.text.trim();
 
-    // --- 1. Validasi Input (Tetap di UI) ---
     if (currentPassword.isEmpty ||
         newPassword.isEmpty ||
         confirmPassword.isEmpty) {
@@ -54,16 +53,12 @@ class _ChangePasswordState extends State<ChangePassword> {
     setState(() => _isLoading = true);
 
     try {
-      // --- INI BAGIAN YANG BERUBAH ---
-      // 1. Panggil service untuk ganti password
+
       await _authService.changePassword(currentPassword, newPassword);
-      // --- AKHIR BAGIAN YANG BERUBAH ---
 
       _showSnack("Password berhasil diperbarui!", Colors.green);
-      if (mounted) Navigator.pop(context); // Kembali
-
+      if (mounted) Navigator.pop(context); 
     } on FirebaseAuthException catch (e) {
-      // Tangani error
       String message;
       if (e.code == 'wrong-password' || e.code == 'INVALID_LOGIN_CREDENTIALS') {
         message = "Password lama Anda salah.";
@@ -92,7 +87,6 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget build(BuildContext context) {
     final Color primaryColor = Color(0xFF1E3A8A);
 
-    // --- (Ini adalah UI yang Anda berikan, dengan controller dan field konfirmasi) ---
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,

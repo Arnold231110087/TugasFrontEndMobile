@@ -1,200 +1,202 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'database.dart';
+import 'database.dart'; 
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final LocalDatabase _localDb = LocalDatabase();
 
-  // --- 1. OTENTIKASI DASAR ---
+  // --- OTENTIKASI DASAR ---
 
-  /// Mendapatkan data user yang sedang login saat ini.
   User? get currentUser => _auth.currentUser;
 
-  /// Fungsi untuk Login dengan Email & Password.
   Future<UserCredential> signIn(String email, String password) async {
-    // 1. Login ke Firebase
     final userCredential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
-
-    // 2. Ambil user
+    
     final user = userCredential.user;
     if (user != null) {
-      // 3. Ambil data user dari Firestore
+      // Sinkronisasi data ke lokal saat login
       final userData = await getUserData(user.uid);
-
-      // 4. Simpan ke SQLite agar bisa diakses offline
       if (userData != null) {
-        await _localDb.saveUser({
-          'uid': user.uid,
-          'email': userData['email'],
-          'username': userData['username'],
-          'bio': userData['bio'] ?? '',
-          'createdAt': userData['createdAt']?.toDate().toString() ??
-              DateTime.now().toIso8601String(),
-        });
+        await _saveUserDataToLocal(userData);
       }
     }
-
     return userCredential;
   }
-
-  /// Fungsi Register
-  Future<UserCredential> register(
-      String email, String password, String username) async {
-    // 1. Buat akun baru
-    UserCredential userCredential =
-        await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    User? user = userCredential.user;
-    final lowerUsername = username.toLowerCase();
-    // 2. Simpan data tambahan ke Firestore
-    if (user != null) {
-      final userData = {
-        'username': lowerUsername,
-        'email': email,
-        'uid': user.uid,
-        'bio': '',
-        'createdAt': Timestamp.now(),
-      };
-
-      await _firestore.collection('users').doc(user.uid).set(userData);
-
-      // 3. Simpan juga ke SQLite
-      await _localDb.saveUser({
-        'uid': user.uid,
-        'email': email,
-        'username': username,
-        'bio': '',
-        'createdAt': DateTime.now().toIso8601String(),
-      });
-    }
-
-    return userCredential;
-  }
-
-  /// Fungsi untuk Logout.
+  
   Future<void> signOut() async {
-    // Hapus data lokal tapi tetap simpan di SQLite jika mau caching
     await _auth.signOut();
   }
 
-  // --- 2. MANAJEMEN AKUN ---
+  /// Register dengan validasi username unik via Transaksi
+  Future<UserCredential> register(
+      String email, String password, String username) async {
+    
+    // 1. Buat user Auth
+    UserCredential userCredential;
+    try {
+      userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      throw e; 
+    }
 
-  /// Ganti Password.
+    User? user = userCredential.user;
+    if (user == null) {
+      throw Exception("Gagal membuat user, user null.");
+    }
+
+    final String lowerUsername = username.toLowerCase();
+    final userRef = _firestore.collection('users').doc(user.uid);
+    final usernameRef = _firestore.collection('usernames').doc(lowerUsername);
+
+    final userDataMap = {
+      'username': lowerUsername,
+      'email': email,
+      'uid': user.uid,
+      'bio': '', 
+      'createdAt': Timestamp.now(), 
+    };
+
+    // 2. Transaksi Simpan Data & Reservasi Username
+    try {
+      await _firestore.runTransaction((transaction) async {
+        // Reservasi nama di koleksi 'usernames'
+        transaction.set(usernameRef, {'uid': user.uid}); 
+        // Simpan profil di koleksi 'users'
+        transaction.set(userRef, userDataMap);
+      });
+      
+      // 3. Simpan ke SQFlite
+      await _saveUserDataToLocal(userDataMap);
+
+    } catch (e) {
+      // Cek error dari Security Rules (username sudah ada)
+      if (e is FirebaseException && (e.code == 'permission-denied' || e.code == 'PERMISSION_DENIED')) {
+        throw FirebaseAuthException(
+          code: 'username-already-in-use',
+          message: 'Nama pengguna ini sudah terdaftar.',
+        );
+      }
+      throw Exception("Transaksi gagal: $e"); 
+    }
+    
+    return userCredential;
+  }
+
+  // --- MANAJEMEN AKUN ---
+
+  /// Ganti Password menggunakan signIn (Anti-Stuck Windows)
   Future<void> changePassword(
       String currentPassword, String newPassword) async {
     User? user = _auth.currentUser;
     if (user == null || user.email == null) {
-      throw FirebaseAuthException(
-          code: 'user-not-found', message: 'User tidak ditemukan.');
+      throw FirebaseAuthException(code: 'user-not-found', message: 'User tidak ditemukan.');
     }
-
-    final String email = user.email!;
-
+    
     try {
-      // Re-authenticate
-      await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: currentPassword,
-      );
-    } on FirebaseAuthException catch (e) {
+      await _auth.signInWithEmailAndPassword(email: user.email!, password: currentPassword);
+    } on FirebaseAuthException catch(e) {
       throw e;
     }
-
     await _auth.currentUser!.updatePassword(newPassword);
   }
 
-  /// Hapus akun dari Auth dan Firestore
+  /// Hapus Akun menggunakan signIn (Anti-Stuck Windows)
   Future<void> deleteUserAccount(String currentPassword) async {
     User? user = _auth.currentUser;
     if (user == null || user.email == null) {
-      throw FirebaseAuthException(
-          code: 'user-not-found', message: 'User tidak ditemukan.');
+      throw FirebaseAuthException(code: 'user-not-found', message: 'User tidak ditemukan.');
     }
 
     final String email = user.email!;
-    final String uid = user.uid;
+    final String uid = user.uid; 
 
     try {
-      await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: currentPassword,
-      );
+      await _auth.signInWithEmailAndPassword(email: email, password: currentPassword);
     } on FirebaseAuthException catch (e) {
-      throw e;
+      throw e; 
     }
 
-    // Hapus data di Firestore
-    await _firestore.collection('users').doc(uid).delete();
+    User? loggedInUser = _auth.currentUser;
+    if (loggedInUser == null || loggedInUser.uid != uid) {
+      throw Exception("Gagal memverifikasi ulang user.");
+    }
+    
+    // Hapus data Firestore & Reservasi Username
+    final userRef = _firestore.collection('users').doc(uid);
+    try {
+      final userDoc = await userRef.get();
+      final username = userDoc.data()?['username'];
+      
+      final batch = _firestore.batch();
+      batch.delete(userRef); 
 
-    // Hapus akun dari Auth
-    await _auth.currentUser!.delete();
-
-    // Hapus dari database lokal
-    await _localDb.deleteUser(uid);
+      if (username != null && username.isNotEmpty) {
+        final usernameRef = _firestore.collection('usernames').doc(username);
+        batch.delete(usernameRef); 
+      }
+      await batch.commit();
+      
+      // Hapus data lokal
+      await _localDb.deleteUser(uid); 
+    } catch (e) {
+      throw Exception("Gagal menghapus data Firestore: $e");
+    }
+    
+    await loggedInUser.delete(); 
   }
 
-  // --- 3. OPERASI DATA FIRESTORE ---
+  // --- OPERASI DATA ---
 
-  /// Ambil data user dari Firestore
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     try {
       final docSnap = await _firestore.collection('users').doc(uid).get();
       return docSnap.data();
     } catch (e) {
-      print("Error mengambil data user: $e");
       return null;
     }
   }
 
-  /// Stream data user realtime
   Stream<DocumentSnapshot<Map<String, dynamic>>> getUserDataStream(String uid) {
     return _firestore.collection('users').doc(uid).snapshots();
   }
 
-  /// Update data pengguna
-  Future<void> updateUserProfileData(
-      String uid, Map<String, dynamic> data) async {
-    await _firestore.collection('users').doc(uid).update(data);
+  /// Simpan riwayat transaksi ke Firestore
+  Future<void> saveTransactionHistoryToFirebase(
+      String myUid, Map<String, dynamic> historyData) async {
+    final firestoreData = Map<String, dynamic>.from(historyData);
+    firestoreData['serverTimestamp'] = FieldValue.serverTimestamp();
 
-    // Sinkronkan ke SQLite juga
-    final currentUserData = await getUserData(uid);
-    if (currentUserData != null) {
-      await _localDb.saveUser({
-        'uid': uid,
-        'email': currentUserData['email'],
-        'username': currentUserData['username'],
-        'bio': currentUserData['bio'] ?? '',
-        'createdAt': currentUserData['createdAt']?.toDate().toString() ??
-            DateTime.now().toIso8601String(),
-      });
-    }
+    await _firestore
+        .collection('users')
+        .doc(myUid)
+        .collection('transaction_history')
+        .add(firestoreData);
   }
 
+  /// Simpan riwayat pencarian ke Firestore
   Future<void> saveSearchHistoryToFirebase(String myUid, Map<String, dynamic> searchedUserData) async {
-    if (myUid == searchedUserData['uid']) return; // Jangan simpan riwayat cari diri sendiri
+    if (myUid == searchedUserData['uid']) return;
     
     await _firestore
         .collection('users')
         .doc(myUid)
         .collection('search_history')
-        .doc(searchedUserData['uid']) // Gunakan UID hasil cari sbg ID
+        .doc(searchedUserData['uid']) 
         .set({
           'username': searchedUserData['username'],
           'searchedUid': searchedUserData['uid'],
           'timestamp': FieldValue.serverTimestamp(),
-          // Anda bisa tambahkan data lain seperti 'profileImageUrl'
         });
   }
 
-  /// Menghapus satu item riwayat dari Firestore
   Future<void> deleteSearchHistoryFromFirebase(String myUid, String searchedUid) async {
      await _firestore
         .collection('users')
@@ -203,30 +205,77 @@ class AuthService {
         .doc(searchedUid)
         .delete();
   }
-  Future<void> saveTransactionHistoryToFirebase(
-      String myUid, Map<String, dynamic> historyData) async {
+
+  /// Update profil dengan validasi username unik via Transaksi
+  Future<void> updateUserProfileData(String uid, Map<String, dynamic> data) async {
     
-    // Buat salinan data agar kita bisa memodifikasinya untuk Firestore
-    final firestoreData = Map<String, dynamic>.from(historyData);
+    if (data.containsKey('username')) {
+      data['username'] = data['username'].toString().toLowerCase();
+    }
+    
+    if (!data.containsKey('username')) {
+      await _firestore.collection('users').doc(uid).update(data);
+    } else {
+      final newUsername = data['username'];
+      final userRef = _firestore.collection('users').doc(uid);
 
-    // Tambahkan timestamp server untuk pengurutan yang akurat di cloud
-    firestoreData['serverTimestamp'] = FieldValue.serverTimestamp();
+      final oldUserDoc = await userRef.get();
+      if (!oldUserDoc.exists) throw Exception("Dokumen user tidak ditemukan.");
+      
+      final oldUsername = oldUserDoc.data()?['username'];
+      
+      // Jika username sama, update biasa
+      if (oldUsername == newUsername) {
+         final dataToUpdate = Map<String, dynamic>.from(data);
+         dataToUpdate.remove('username');
+         if (dataToUpdate.isNotEmpty) await userRef.update(dataToUpdate);
+      } else {
+        // Jika username beda, cek keunikan
+        final newUsernameRef = _firestore.collection('usernames').doc(newUsername);
+        
+        await _firestore.runTransaction((transaction) async {
+          final newUsernameDoc = await transaction.get(newUsernameRef);
+          if (newUsernameDoc.exists) {
+            throw FirebaseAuthException(
+              code: 'username-already-in-use',
+              message: 'Nama pengguna ini sudah terdaftar.',
+            );
+          }
+          
+          if (oldUsername != null && oldUsername.isNotEmpty) {
+            final oldUsernameRef = _firestore.collection('usernames').doc(oldUsername);
+            transaction.delete(oldUsernameRef);
+          }
+          transaction.set(newUsernameRef, {'uid': uid});
+          transaction.update(userRef, data);
+        });
+      }
+    }
 
-    await _firestore
-        .collection('users')
-        .doc(myUid)
-        .collection('transaction_history') // <-- Koleksi baru
-        .add(firestoreData); // .add() untuk membuat ID dokumen unik
+    // Sinkronkan ke Lokal
+    final updatedUserData = await getUserData(uid);
+    if (updatedUserData != null) {
+      await _saveUserDataToLocal(updatedUserData);
+    }
   }
 
-  /// Mengambil riwayat dari Firestore (untuk sinkronisasi saat login)
-  Stream<QuerySnapshot<Map<String, dynamic>>> getSearchHistoryStream(String myUid) {
-    return _firestore
-        .collection('users')
-        .doc(myUid)
-        .collection('search_history')
-        .orderBy('timestamp', descending: true)
-        .limit(10)
-        .snapshots();
+  // Helper: Simpan ke SQFlite
+  Future<void> _saveUserDataToLocal(Map<String, dynamic> userData) async {
+    String createdAtString;
+    if (userData['createdAt'] is Timestamp) {
+      createdAtString = (userData['createdAt'] as Timestamp).toDate().toIso8601String();
+    } else if (userData['createdAt'] is String) {
+      createdAtString = userData['createdAt'];
+    } else {
+      createdAtString = DateTime.now().toIso8601String();
+    }
+
+    await _localDb.saveUser({
+      'uid': userData['uid'],
+      'email': userData['email'],
+      'username': userData['username'],
+      'bio': userData['bio'] ?? '',
+      'createdAt': createdAtString,
+    });
   }
 }
