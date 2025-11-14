@@ -58,8 +58,8 @@ class AuthService {
     };
 
     try {
+      await _firestore.collection('usernames').doc(username).set({});
       await _firestore.collection('users').doc(user.uid).set(userDataMap);
-      
       await _saveUserDataToLocal(userDataMap);
 
     } catch (e) {

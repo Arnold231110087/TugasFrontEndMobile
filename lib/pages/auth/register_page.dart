@@ -48,6 +48,8 @@ class _RegisterPageState extends State<RegisterPage> {
         message = 'Email sudah terdaftar, gunakan email lain.';
       } else if (e.code == 'weak-password') {
         message = 'Kata sandi terlalu lemah (minimal 6 karakter).';
+      } else if (e.code == 'permission-denied'){
+        message = 'Nama pengguna ini sudah terdaftar. Coba yang lain.';
       } else if (e.code == 'username-already-in-use') { 
         // Error custom dari AuthService
         message = 'Nama pengguna ini sudah terdaftar. Coba yang lain.';
